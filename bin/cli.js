@@ -169,7 +169,7 @@ const updateCommand = async (options) => {
     // Check if .agents exists
     if (!fs.existsSync(agentDir)) {
         console.log(chalk.red(`Error: Could not find ${AGENT_FOLDER} folder at: ${targetDir}`));
-        console.log(chalk.yellow(`Tip: Run ${chalk.cyan('npx redwavelabs-kit init')} to install first.`));
+        console.log(chalk.yellow(`Tip: Run ${chalk.cyan('npx ea-kit init')} to install first.`));
         process.exit(1);
     }
 
@@ -222,7 +222,7 @@ const statusCommand = (options) => {
         console.log(chalk.gray('────────────────────────────────────────\n'));
     } else {
         console.log(chalk.red('[X] Not installed'));
-        console.log(chalk.yellow(`Run ${chalk.cyan('npx redwavelabs-kit init')} to install.\n`));
+        console.log(chalk.yellow(`Run ${chalk.cyan('npx ea-kit init')} to install.\n`));
     }
 };
 
@@ -233,7 +233,7 @@ const statusCommand = (options) => {
 const program = new Command();
 
 program
-    .name('redwavelabs-kit')
+    .name('ea-kit')
     .description('CLI tool to install and manage RedWave Labs Agent Kit')
     .version(pkg.version, '-v, --version', 'Display version number');
 
