@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "skills": {
+    "code-review-excellence": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "7437cac5798603b94ce1019fa701c659a3deddcfc8c482a3ac42b8bcb65f6d4e"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "computedHash": "6412eb4eb3b91595ebab937f0c69501240e7ba761b3d82510b5cf506ec5c7adc"
+    },
+    "mql-developer": {
+      "source": "ThomasPraun/mql-developer",
+      "sourceType": "github",
+      "computedHash": "76b48ff852bb0c750fef5be1b19e871a14342a963bc7bcf6ac04c9898e6efbd5"
+    },
+    "mql5-docs-research": {
+      "source": "tmaru-eng/strategy-bricks",
+      "sourceType": "github",
+      "computedHash": "30cc07f0ffd4576eb59988cd4311cbcab18cc10dd449e36945daf3b8529e0f88"
+    },
+    "mql5-indicator-patterns": {
+      "source": "terrylica/cc-skills",
+      "sourceType": "github",
+      "computedHash": "964a837c1fe01bb45487044e41c591456e193fe1fed3ccd98161a7387380db68"
+    },
+    "plan-writing": {
+      "source": "vudovn/antigravity-kit",
+      "sourceType": "github",
+      "computedHash": "b066c80938930371c25dec46bf608817dce7e2c6e1a902f1c8e8d893e6226fcc"
+    },
+    "product-requirements": {
+      "source": "cexll/myclaude",
+      "sourceType": "github",
+      "computedHash": "0333518feab4652ee6c9da8525e7e0d73941c7a771deef313b7aad01de5e30de"
+    }
+  }
+}
