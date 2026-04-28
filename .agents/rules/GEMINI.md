@@ -14,9 +14,10 @@ trigger: always_on
 
 | Request Type            | Required Action                                                             |
 | ----------------------- | --------------------------------------------------------------------------- |
-| **New EA / Strategy**   | **STOP** → ASK minimum 3 strategic questions (Trend/Range, Timeframe, Risk) |
+| **Massive System/EA**   | **STOP** → Decompose into sub-projects. Do NOT ask detailed questions yet.  |
+| **New EA / Strategy**   | **STOP** → Ask 3 strategic questions **SEQUENTIALLY** (one at a time).      |
 | **Code Edit / Bug Fix** | Confirm understanding + ask impact questions                                |
-| **Vague / Simple**      | Ask Purpose, Symbol, and Scope                                              |
+| **Vague / Simple**      | Ask Purpose, Symbol, and Scope **SEQUENTIALLY**.                            |
 | **Full Orchestration**  | **STOP** subagents until user confirms plan details                         |
 | **Direct "Proceed"**    | **STOP** → Even if answers are given, ask 1 "Edge Case" question            |
 
@@ -112,7 +113,10 @@ Whenever an Agent starts a task involving specific technologies, they **MUST** a
 
 ## 🏁 5. COMPLETION & REVIEW (FINAL CHECKS)
 
-**Completion Definition:** A task is NOT entirely finished until a review process is executed.
+**The Iron Law:** Evidence Before Claims. NO completion claims without fresh verification evidence.
+You are strictly FORBIDDEN from using phrases like "It's done", "I fixed it", or "It should work now" unless you have run a verification command (compilation, tests, linting) in the current session and read a successful output. If you haven't run the command, you cannot claim it passes.
+
+**Completion Definition:** A task is NOT entirely finished until a review process is executed and verified.
 When user says "final checks", "review", or indicates completion, perform a high-level manual audit.
 
 Priority Execution Order:
@@ -121,4 +125,7 @@ Priority Execution Order:
 2. **Risk Compliance** (Is RiskManager called prior to Opening?)
 3. **Loop Overflows** (Are OnCalculate/OnTick loops optimal? No endless modification!)
 4. **GitNexus Impact** (Did you run impact analysis and detect changes scope? No HIGH/CRITICAL unhandled risk allowed)
-5. **Post-Task Graph Update:** Upon task completion or before finishing a heavy refactor, the Agent MUST proactively use the `run_command` tool to execute `npx gitnexus analyze` to keep the codebase index fresh.
+5. **Post-Task Graph Update:** Upon task completion or before finishing a heavy refactor, the Agent MUST proactively use the `run_command` tool to execute `npx gitnexus analyze` (or `npx gitnexus analyze --embeddings` if embeddings exist) to keep the codebase index fresh.
+
+> 🔴 **Agents & Skills can invoke automated runner scripts** if available or present a checklist for manual verification.
+> **Git Hook Recommendation:** Suggest the user to execute `git commit` to offload the re-indexing to a background post-commit hook if available.

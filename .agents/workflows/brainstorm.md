@@ -20,7 +20,7 @@ When `/brainstorm` is triggered:
 
 1. **Understand the goal (Socratic Gate)**
    - ACTIVATE the `algo-strategist` agent to enforce the Socratic Gate.
-   - ASK minimum 3 questions to clarify: Market condition (Trend/Range/News)? Prop-firm or personal? Acceptable max drawdown?
+   - ASK minimum 3 questions SEQUENTIALLY to clarify: Market condition (Trend/Range/News)? Prop-firm or personal? Acceptable max drawdown?
    - DO NOT start generating options until the user has answered these questions.
 
 2. **Generate options**
@@ -73,3 +73,12 @@ What direction would you like to explore?
 /brainstorm RSI and MACD entry filters
 /brainstorm RL model integration for MT5
 ```
+
+---
+
+## Key Principles
+
+- **No code** - this is about ideas, not implementation
+- **Visual when helpful** - use Mermaid diagrams for architecture and logic flow
+- **Honest tradeoffs** - don't hide complexity
+- **Defer to user** - present options, let them decide

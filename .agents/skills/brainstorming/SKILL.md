@@ -21,14 +21,32 @@ allowed-tools: Read, Glob, Grep
 | Update/change request                       | 🛑 Confirm scope                   |
 | Vague requirements                          | 🛑 Ask purpose, users, constraints |
 
-### 🚫 MANDATORY: 3 Questions Before Implementation
+### 🚫 MANDATORY: The Process
 
-1. **STOP** - Do NOT start coding
-2. **ASK** - Minimum 3 questions:
-   - 🎯 Purpose: What problem are you solving?
-   - 👥 Users: Who will use this?
-   - 📦 Scope: Must-have vs nice-to-have?
-3. **WAIT** - Get response before proceeding
+1. **Decomposition Check:** If the request describes a massive system (e.g., "build an entire EA grid system from scratch"), flag it immediately and decompose into smaller, independent sub-projects before asking detailed questions.
+2. **STOP** - Do NOT start coding.
+3. **ASK** - Minimum 3 questions (Purpose, Users, Scope).
+   - 🎯 **Purpose:** What problem are you solving?
+   - 👥 **Users:** Who will use this?
+   - 📦 **Scope:** Must-have vs nice-to-have?
+   > **UX Rule:** Ask these sequentially ("one at a time") or use multiple-choice options to avoid overwhelming the user.
+4. **PROPOSE** - Offer 2-3 different approaches with trade-offs. Present them conversationally with your clear recommendation and reasoning.
+5. **WAIT** - Get response before proceeding.
+
+---
+
+## 📝 Design Document Handoff (Before Coding)
+
+**MANDATORY:** Do NOT invoke implementation skills or write code until a design is approved.
+
+1. **Present Design:** Summarize architecture, data flow, components, and trade-offs. Ensure boundaries are clear.
+2. **Write Doc:** Save the validated design into the workspace `docs/` folder (following `documentation-standards` rules, e.g., PRD or ADR).
+3. **Spec Self-Review (Crucial):** Before asking the user to review, review your own doc:
+    - *Placeholder scan:* Fix any TBDs, TODOs, or vague requirements.
+    - *Consistency check:* Ensure architecture matches feature descriptions.
+    - *Ambiguity check:* If a requirement can be interpreted in 2 ways, pick one and make it explicit.
+4. **User Review:** Ask the user: *"Spec written and committed. Please review it before we start implementation."*
+5. **Transition:** Only proceed to code/planning AFTER explicit user approval.
 
 ---
 
@@ -75,6 +93,18 @@ allowed-tools: Read, Glob, Grep
 ```
 
 **For detailed domain-specific question banks and algorithms**, see: `dynamic-questioning.md`
+
+---
+
+## 🎨 Visual Companion (For Architecture & Flow)
+
+When anticipating questions that involve complex system architecture, state machines, or algorithmic logic, offer the visual companion once for consent:
+
+> "Some of what we're working on might be easier to explain if I draw a diagram. I can put together Mermaid charts or logic flow diagrams as we go. Want to try it?"
+
+- **This offer MUST be its own message.** Do not combine it with clarifying questions. Wait for response.
+- **Use diagrams:** For state machines, order flows, RiskManager interactions, and module dependencies.
+- **Use terminal:** For text, requirements, trade-offs, scope.
 
 ---
 

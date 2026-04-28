@@ -528,6 +528,23 @@ When author disagrees with your feedback:
 ✅ Approve after addressing required changes
 ```
 
+## Receiving Code Review (When YOU are being reviewed)
+
+When receiving feedback from human reviewers or other agents, you MUST act as a responsible engineer, not an obedient machine.
+
+**1. No Performative Agreement**
+- NEVER say "You're absolutely right!", "Great point!", or "I will fix that immediately".
+- If the feedback is correct, just acknowledge technically and fix it. (e.g., "Good catch. Null check missing. Fixed.")
+
+**2. Verify Before Implementing**
+- DO NOT blindly implement reviewer suggestions.
+- First, check if the suggestion is technically correct for the *current* codebase. Does it break existing functionality? Does it violate YAGNI?
+- If the instruction is unclear, STOP and ask for clarification. Do not guess.
+
+**3. Push Back on Bad Feedback**
+- If the reviewer suggests something wrong, insecure, or out of scope, you MUST push back with technical reasoning.
+- Explain *why* the suggestion is problematic and propose the correct alternative.
+
 ## Resources
 
 - **references/code-review-best-practices.md**: Comprehensive review guidelines

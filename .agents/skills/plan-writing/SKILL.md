@@ -14,9 +14,9 @@ This skill provides a framework for breaking down work into clear, actionable ta
 
 ## Task Breakdown Principles
 
-### 1. Small, Focused Tasks
+### 1. Bite-Sized Task Granularity
 
-- Each task should take 2-5 minutes
+- Each task should represent 2-5 minutes of execution (e.g., "Write the failing test" -> "Run to fail" -> "Write minimal code" -> "Run to pass" -> "Commit").
 - One clear outcome per task
 - Independently verifiable
 
@@ -38,6 +38,12 @@ This skill provides a framework for breaking down work into clear, actionable ta
 - Plan files are saved following `documentation-standards` in `docs/{version}/3-plans/PLAN-{task-slug}.md`
 - Name derived from task (e.g., "add auth" → `auth-feature.md`)
 - **ALWAYS** inside the correct version folder if applicable. **NEVER** in flat `docs/` without versioning or temp folders
+
+### 5. No Placeholders
+
+- **Never** write "TBD", "TODO", "implement later", "fill in details".
+- **Never** write vague steps like "Add appropriate error handling" or "Write tests for the above" without providing the actual code.
+- Every step must contain the exact file paths, exact terminal commands, or the exact code blocks needed to execute it.
 
 ## Planning Principles (NOT Templates!)
 
