@@ -60,6 +60,7 @@ When auto-applying an agent, inform the user:
 | ------------------------------------------ | ---------------------- | ---------------------------------------------- |
 | **STRATEGY & PLANNING** (Rules, ML, Risk)  | `algo-strategist`      | PRD, Trading Rules, Brainstorming, Architecture|
 | **MQL5 DEV** (Indicators, EA, OrderSend)   | `mql5-expert`          | OOP Code, CTrade, RiskManager, Pending Orders  |
+| **cTRADER C# DEV** (cBot, cAlgo.API)       | `cbot-expert`          | C# Code, ExecuteMarketOrder, PipSize, .NET API |
 | **TESTING & LOGS** (Strategy Tester, Bugs) | `ea-tester`            | Backtest Reports, Error 10016, Slippage        |
 
 > 🔴 **CRITICAL BOUNDARIES**: Agents MUST stay within their domains.
@@ -85,6 +86,7 @@ We do not preload massive framework documentation. Instead, Agents will dynamica
 Whenever an Agent starts a task involving specific technologies, they **MUST** apply the relevant skill:
 
 - **MQL5 Coding Standards**: `mql5-clean-code`, `mql-developer`
+- **cTrader/C# Coding Standards**: `cbot-clean-code`, `mt5-to-cbot-migration`, `ctrader-mcp-servers`
 - **Trading/Risk Logic**: `rwcommon-library-patterns`, `mql5-indicator-patterns`
 - **Testing & Debugging**: `ea-debugging-patterns`, `code-review-excellence`, `mql5-docs-research`
 - **Product / Requirements**: `brainstorming`, `plan-writing`, `product-requirements`
