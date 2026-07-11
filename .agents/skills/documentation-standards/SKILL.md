@@ -31,8 +31,9 @@ docs/
 
 **🔴 Rules for Agents:**
 - **`algo-strategist`**: Save requirements in `1-prds/`, plans in `3-plans/`.
-- **`mql5-expert`**: Save structural flows in `2-architecture/` and track tasks in `4-tasks/`.
+- **`mql5-expert` / `cbot-expert`**: Save structural flows in `2-architecture/` and track tasks in `4-tasks/`.
 - **`ea-tester`**: Save and analyze backtest results in `5-reports/`.
+- **`documentation-writer`**: Polish README/ADR/report write-ups only when the user explicitly requests docs.
 
 ## 2. README Structure for EA
 

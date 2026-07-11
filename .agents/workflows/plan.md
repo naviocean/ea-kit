@@ -49,7 +49,8 @@ The plan MUST include:
 2. **Strategy Rules**: Exact entry conditions, exit conditions, filters.
 3. **Architecture**: Which RWCommon modules are needed (e.g., CycleManager, RiskManager).
 4. **Task Breakdown**: Step-by-step implementation plan.
-5. **Agent Assignments**: Which agents (`mql5-expert`, `ea-tester`) will handle which tasks.
+5. **Agent Assignments**: Which agents handle which tasks (`mql5-expert` and/or `cbot-expert`, `ea-tester`; `documentation-writer` only if docs were requested).
+6. **Platform**: MetaTrader 5, cTrader, or migration — so `/orchestrate` routes correctly.
 
 ---
 

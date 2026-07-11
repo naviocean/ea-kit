@@ -1,69 +1,72 @@
-# RedWave Labs Workflow Reference
+# RedWave Labs EA Workflow Reference
 
-This directory contains executable Workflow commands that act as entry points for the Antigravity Agent within the RedWave Labs Nx Monorepo. By using these `/commands`, you trigger predefined, multi-agent processes designed to ensure quality and consistency across frontend, backend, and testing.
+This directory contains executable workflow commands for the EA Agent Kit. Use them as entry points so agents follow a consistent lifecycle: clarify → plan → implement → verify.
 
-## 🚀 Execution Commands
+## Execution
 
-You can trigger any workflow by typing its path or command prefix in your prompt.
-Example: `/plan user authentication system` or `/test web`
+Trigger a workflow by path or command prefix in your prompt.
 
----
-
-### 📅 Phase 0: Ideation & Planning
-
-_Do not write code before requirements are clear!_
-
-| Command           | Agent                           | Description                                                                                                                                 | Usage Example                          |
-| ----------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| **`/brainstorm`** | `product-manager` / `team-lead` | Structured brainstorming for projects and features. Explores multiple options, tradeoffs, and edge-cases before implementation.             | `/brainstorm next-gen auth approaches` |
-| **`/plan`**       | `product-manager`               | Creates a comprehensive project plan (`docs/{version}/3-plans/PLAN-xxx.md`) based on detailed Socratic questioning. **No code is written.** | `/plan real-time chat feature`         |
+Examples: `/plan XAUUSD session breakout` or `/test report reports/bt-xau.html`
 
 ---
 
-### 🏗️ Phase 1: Setup & Architecture
+## Phase 0: Ideation & Planning
 
-_Scaffolding applications, packages, and underlying infrastructure._
+_Do not write strategy code before requirements are clear._
 
-| Command                  | Agent                 | Description                                                                                                            | Usage Example                                 |
-| ------------------------ | --------------------- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| **`/init-monorepo`**     | `team-lead`           | Initializes the entire RedWave Labs Nx Monorepo architecture (Next.js, NestJS, Prisma). Use only for fresh setups.     | `/init-monorepo`                              |
-| **`/generate-project`**  | `team-lead`           | Scaffolds a new App (frontend/backend) or Library (UI/feature code) inside the monorepo, using official Nx Generators. | `/generate-project new Next.js dashboard app` |
-| **`/setup-frontend-ui`** | `frontend-specialist` | Integrates TailwindCSS and Shadcn UI into an existing Next.js application, organizing them properly.                   | `/setup-frontend-ui apps/web-dashboard`       |
-
----
-
-### 🎨 Phase 2: Design & Implementation
-
-_Writing code, designing interfaces, and cross-agent orchestrations._
-
-| Command               | Agent            | Description                                                                                                                              | Usage Example                                  |
-| --------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| **`/design-feature`** | `ui-ux-designer` | Brainstorms and designs UI/UX for a new feature directly via the StitchMCP UI Design tool, exporting specifications.                     | `/design-feature landing page pricing section` |
-| **`/orchestrate`**    | (All Agents)     | Coordinates a multi-agent assembly line. Used for complex full-stack features requiring Frontend, Backend, and DB agents simultaneously. | `/orchestrate implement user login system`     |
+| Command | Agent | Description | Example |
+| ------- | ----- | ----------- | ------- |
+| **`/brainstorm`** | `algo-strategist` | Structured strategy exploration: options, tradeoffs, drawdown vs PF, MQL5/cTrader constraints. | `/brainstorm mean reversion Asian session` |
+| **`/plan`** | `algo-strategist` | Creates a versioned plan under `docs/{version}/3-plans/PLAN-*.md`. **No implementation code.** | `/plan trailing stop for grid EA` |
 
 ---
 
-### 🧪 Phase 3: QA & Testing
+## Phase 1: Implementation & Coordination
 
-_Automated validation and test suite execution._
+| Command | Agents | Description | Example |
+| ------- | ------ | ----------- | ------- |
+| **`/orchestrate`** | Multi-agent | Coordinates specialists for a full EA/cBot lifecycle (plan → code → test). Minimum 2 agents. | `/orchestrate implement session breakout EA` |
 
-| Command     | Agent         | Description                                                                                                            | Usage Example                                           |
-| ----------- | ------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| **`/test`** | `qa-engineer` | Generates or executes tests strictly using `nx test` or `nx e2e`. Interprets failures and attempts self-healing fixes. | `/test web`, `/test e2e api`, `/test apps/web/utils.ts` |
+Platform routing inside `/orchestrate`:
+
+- **MetaTrader 5 (MQL5)** → `mql5-expert` + `ea-tester`
+- **cTrader (C# cBot)** → `cbot-expert` (+ `ea-tester` for logic/report review when applicable)
+
+Optional (only when the user explicitly asks for docs): `documentation-writer`.
 
 ---
 
-## 🛑 How the Gate Rules Apply
+## Phase 2: QA & Backtest Analysis
 
-Every single workflow command obeys the **Socratic Gate (Tier 0)** rules defined in `.agents/GEMINI.md`. If your request to the workflow is too vague to be safely executed, the invoked Agent _will_ block the process and ask clarifying questions first.
+| Command | Agent | Description | Example |
+| ------- | ----- | ----------- | ------- |
+| **`/test`** | `ea-tester` | Analyze Strategy Tester reports/logs, MT5 error codes, edge cases (slippage, spread, gaps). | `/test report bt-2024.html`, `/test logs journal.log` |
 
-_If asked an architectural question by an agent, please answer clearly so the workflow can safely proceed._
+---
+
+## Available Agents
+
+| Agent | Domain | Primary use |
+| ----- | ------ | ----------- |
+| `algo-strategist` | Strategy / PRD / risk | Requirements, rules, plans |
+| `mql5-expert` | MQL5 / RWCommon | EA & indicator implementation |
+| `cbot-expert` | cTrader C# | cBot implementation & MT5→cBot migration |
+| `ea-tester` | Testing / logs | Backtest reports, journal bugs, review |
+| `documentation-writer` | Docs only | README, PRD polish, ADRs, changelogs (explicit request only) |
+
+---
+
+## Gate Rules
+
+Every workflow obeys the **Socratic Gate (Tier 0)** in `.agents/rules/GEMINI.md`. Vague requests are blocked with clarifying questions (symbol, timeframe, risk, scope) before coding.
+
+Answer architectural questions clearly so the workflow can proceed.
+
+---
 
 ## Extending Workflows
 
-To create a new workflow:
-
-1. Add a Markdown file to this `.agents/workflows` directory.
-2. The frontmatter MUST include `description: <brief explanation>`.
-3. The content should clearly outline the **Purpose**, the **CRITICAL RULES**, and the **Task Execution Steps**.
-4. Reference the specific RedWave Labs Agents (e.g., `team-lead`, `qa-engineer`) or Skills that should be activated.
+1. Add a Markdown file under `.agents/workflows/`.
+2. Frontmatter MUST include `description: <brief explanation>`.
+3. Document **Purpose**, **CRITICAL RULES**, and **execution steps**.
+4. Reference only agents that exist under `.agents/agents/` and skills under `.agents/skills/`.
