@@ -1,67 +1,61 @@
 ---
-description: Create project plan using algo-strategist agent. Explores strategy rules and creates a plan file.
+description: Lập plan giao dịch (algo-strategist). Không viết code implementation.
 ---
 
-# /plan - Systematic Trading Planning Mode
+# /plan — Planning mode
 
 $ARGUMENTS
 
 ---
 
-## Purpose
+## Harness
 
-This command initiates the planning phase for a new EA or Indicator using the `algo-strategist` agent to ensure requirements are clear before any code is written.
-
----
-
-## 🔴 CRITICAL RULES
-
-1. **NO CODE WRITING** - This command creates a plan file ONLY. Do not write implementation code.
-2. **Agent Selection** - Switch to the `algo-strategist` agent to handle this request.
-3. **Socratic Gate (Tier 0)** - ALWAYS ask clarifying questions before generating the plan.
-4. **Relevant Skills** - Apply `brainstorming`, `plan-writing`, and `documentation-standards` skills.
+- **class:** `strategy` hoặc `feature` (chọn theo scope)  
+- **mode:** `plan`  
+- **persona:** `algo-strategist`  
+- **SESSION:** không bắt buộc nếu one-shot; có nếu multi-day  
 
 ---
 
-## Task Execution
+## CRITICAL
 
-### Phase 1: Clarification (Socratic Gate)
-
-- Review the `$ARGUMENTS` (User Request).
-- Ask minimum 2-3 strategic questions regarding Purpose, Target Symbol, Timeframe, or Risk parameters.
-- Wait for user confirmation before proceeding.
-
-### Phase 2: Folder Structure
-
-- Read `docs/PROJECT_ROOT.md` to identify the current active project version (e.g., `v1.0`). If the file doesn't exist, assume `v1.0`.
-- Ensure the destination directory exists (e.g., `docs/v1.0/3-plans/`). NEVER put plan files in the repository root or flat `docs/` folder.
-
-### Phase 3: Plan Generation
-
-- Once requirements are clear, generate a structured plan document.
-- **Output Location**: `docs/{version}/3-plans/PLAN-{task-slug}.md`
-
-### Phase 4: Content of the Plan
-
-The plan MUST include:
-
-1. **Trading Objective**: Summary of what needs to be built (EA vs Indicator, Scalper vs Swing).
-2. **Strategy Rules**: Exact entry conditions, exit conditions, filters.
-3. **Architecture**: Which RWCommon modules are needed (e.g., CycleManager, RiskManager).
-4. **Task Breakdown**: Step-by-step implementation plan.
-5. **Agent Assignments**: Which agents handle which tasks (`mql5-expert` and/or `cbot-expert`, `ea-tester`; `documentation-writer` only if docs were requested).
-6. **Platform**: MetaTrader 5, cTrader, or migration — so `/orchestrate` routes correctly.
+1. **KHÔNG viết code** EA/cBot — chỉ plan/PRD.  
+2. Gate theo class (strategy = Socratic symbol/TF/risk/edge).  
+3. Skills: `brainstorming` (nếu mơ hồ), `plan-writing`, `documentation-standards`.  
+4. RWCommon: ghi rõ dự kiến `required|optional` trong plan (detect project nếu đã có code).
 
 ---
 
-## Completion
+## Các bước
 
-Inform the user:
+### 1. Clarification
+
+- Hỏi đủ thông tin blocking (lần lượt nếu strategy).  
+- Chờ user trước khi ghi plan.
+
+### 2. Version docs
+
+- Đọc `docs/PROJECT_ROOT.md` → `{version}` (mặc định `v1.0`).  
+- Đảm bảo `docs/{version}/3-plans/` tồn tại.
+
+### 3. Ghi plan
+
+- Path: `docs/{version}/3-plans/PLAN-{slug}.md`  
+- Nội dung tối thiểu:
+  1. Mục tiêu (EA / Indicator / cBot)
+  2. Rules entry/exit/filter
+  3. Platform + module (RWCommon flexible / cAlgo)
+  4. Task breakdown
+  5. Persona assignments + **cần HANDOFF ở đâu**
+  6. Verify profile dự kiến (`mt5-code` / `cbot-code`)
+  7. Definition of done
+
+### 4. Kết
 
 ```
-[OK] Plan created: docs/{version}/3-plans/PLAN-{slug}.md
+[OK] Plan: docs/{version}/3-plans/PLAN-{slug}.md
 
-Next steps:
-- Review the plan.
-- If approved, we can begin implementation using `/orchestrate`.
+Bước tiếp:
+- Review plan.
+- Approve xong có thể /orchestrate hoặc implement theo HANDOFF.
 ```

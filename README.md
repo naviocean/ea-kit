@@ -36,27 +36,44 @@ After install, the project gets `.agents/ea-kit-version.json` (name + version + 
 3. Enable MCP from `.agents/mcp_config.json` when using GitNexus (optional but recommended for large codebases).
 4. Drive work with workflows: `/brainstorm`, `/plan`, `/orchestrate`, `/test`.
 
-## Core Framework: RWCommon Pattern
+## Agent harness (control plane)
 
-This kit enforces the **RWCommon Library** architecture for MT5 EAs. Agents structure logic and route orders through standard wrappers (`RiskManager`, `TradeExecutor`, `TrailingManager`, etc.) for reliable error handling (e.g. 10016), and consistent pip/point scaling. Native MT5 `OrderSend` is restricted unless RWCommon cannot support the case.
+Always-on rules: **`.agents/rules/GEMINI.md`** (tiếng Việt) — classify request → gate depth → mode → persona → verify.
 
-cTrader work uses `cbot-clean-code`, `mt5-to-cbot-migration`, and related skills — not MQL5 syntax.
+| Doc | Purpose |
+| --- | ------- |
+| [DESIGN-agent-harness.md](docs/architecture/DESIGN-agent-harness.md) | Full harness design |
+| [ADR-003-agent-harness.md](docs/architecture/ADR-003-agent-harness.md) | Decision record |
+| [VERIFY-PROFILES.md](docs/architecture/VERIFY-PROFILES.md) | Iron Law checklists (MT5 / cBot / analyze) |
+| `docs/v1.0/4-tasks/HANDOFF.template.md` | Cross-persona handoff |
+| `docs/v1.0/4-tasks/SESSION.template.md` | Session map (orchestrate / multi-day) |
+
+**Request classes:** `trivial` · `bugfix` · `analyze` · `strategy` · `feature` · `orchestrate` · `docs` · `meta`  
+**Modes:** `intake` → `plan` | `implement` | `review` → `done`
+
+## RWCommon (flexible)
+
+If the project already uses `Include/RWCommon` (or a project flag), agents treat RWCommon as **required** for trade/risk paths.  
+Greenfield / no lib → **optional** (native allowed with notes); still enforce retcodes, stops, pip/point.  
+User override always wins.
+
+cTrader uses `cbot-clean-code` / migration skills — not MQL5/RWCommon.
 
 ## Agents
 
 | Agent | Role |
 | ----- | ---- |
 | `algo-strategist` | Strategy, risk, PRDs, plans (no platform code) |
-| `mql5-expert` | MQL5 EA/indicator implementation (RWCommon) |
+| `mql5-expert` | MQL5 EA/indicator implementation |
 | `cbot-expert` | cTrader C# cBot implementation |
 | `ea-tester` | Strategy Tester reports, journals, edge cases |
 | `documentation-writer` | README / ADR / docs only when explicitly requested |
 
 ## Features
 
-- **Socratic Gate (Tier 0):** Clarifies symbol, timeframe, risk, and logic gaps before strategy code.
-- **Intelligent routing (Tier 1):** Routes strategy → strategist, MQL5 → `mql5-expert`, cBot → `cbot-expert`, logs/backtests → `ea-tester`.
-- **Lazy-loading skills:** Loads modules such as `mql5-clean-code`, `rwcommon-library-patterns`, `ea-debugging-patterns`, `cbot-clean-code` only when needed.
+- **Class-based gates:** Full Socratic only for strategy/orchestrate — not every one-line fix.
+- **Modes + HANDOFF:** Multi-role via durable files (not fake multi-process agents).
+- **Skill tiers:** Core (≤2) + on-demand + single reference file.
 - **Workflows:** `/brainstorm`, `/plan`, `/orchestrate`, `/test` — see `.agents/workflows/README.md`.
 - **Docs layout:** Versioned `docs/{version}/…` per `documentation-standards`.
 

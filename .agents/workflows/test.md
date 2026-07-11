@@ -1,36 +1,43 @@
 ---
-description: Test generation and execution command. Analyzes backtest reports and tests EA behavior using ea-tester.
+description: Phân tích backtest/log (ea-tester). Class analyze — không phải web unit test.
 ---
 
-# /test - EA Backtest & Strategy Validation
+# /test — Backtest & validation
 
 $ARGUMENTS
 
 ---
 
-## Purpose
+## Harness
 
-This command utilizes the `ea-tester` agent to analyze Strategy Tester (or cTrader backtest) outputs, check logs, or evaluate a backtest for RedWave Labs EAs/cBots.
+- **class:** `analyze`  
+- **mode:** `review`  
+- **persona:** `ea-tester`  
+- **verify_profile:** `analyze-only`  
+- **SESSION:** không bắt buộc  
+
+Được **dùng tool ngay** (đọc report/log) — không Socratic strategy, không design doc.
 
 ---
 
-## 🔴 CRITICAL RULES
+## CRITICAL
 
-1. **Agent Selection**: ALWAYS route this request to the `ea-tester` agent.
-2. **Relevant Skills**: Apply `ea-debugging-patterns` (and `mql5-docs-research` for obscure MT5 codes).
-3. **Focus on trading platforms**: Not web/unit-test suites. Prefer MT5 error codes (10016, 4756, 10013), invalid stops, fill modes, drawdown stats; for cBot, reason about logs/results the user provides with the same risk mindset.
+1. Luôn persona `ea-tester`.  
+2. Skill: `ea-debugging-patterns` (+ docs research nếu mã lỗi lạ).  
+3. Tập trung platform trading: MT5 codes (10016, 4756, 10013), DD, PF, modify spam; cBot theo log user cung cấp.  
+4. **Không** tự nhảy sang sửa code im lặng. Cần fix → viết **HANDOFF** sang `mql5-expert` / `cbot-expert`.
 
-## Sub-commands & Usage
+## Sub-commands
 
 ```
-/test report [file.xml/html] - Analyze a Strategy Tester (or exported) report
-/test logs [journal.log]     - Search for errors in terminal logs
-/test logic                  - Suggest edge-case tests (slippage, gaps, widen spread)
+/test report [file]  — Phân tích Strategy Tester / report
+/test logs [file]    — Lỗi trong journal
+/test logic          — Gợi ý edge-case (slippage, gap, spread)
 ```
 
 ## Behavior
 
-1. Analyze given data (profits, drawdowns, trade frequency, latency/modify spam).
-2. Propose fixes to inputs, symbols, timeframe, or code handoff to `mql5-expert` / `cbot-expert` if tests fail.
-3. Use text search on log files when an exact error string is needed.
-4. Store lasting write-ups under `docs/{version}/5-reports/` when the user wants a durable report (follow `documentation-standards`).
+1. Đọc data (profit, DD, tần suất lệnh, latency/modify).  
+2. Findings cụ thể + path file.  
+3. Đề xuất input/TF/symbol **hoặc** HANDOFF fix.  
+4. Báo cáo bền vững (nếu user muốn): `docs/{version}/5-reports/REPORT-*.md`.

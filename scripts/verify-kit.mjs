@@ -259,6 +259,68 @@ if (fs.existsSync(path.join(ROOT, 'others'))) {
     else warn('others/ exists without README.md');
 }
 
+// --- Harness v0.1 contracts ---
+console.log('\nHarness v0.1');
+const geminiPath = path.join(AGENTS_DIR, 'rules', 'GEMINI.md');
+if (!fs.existsSync(geminiPath)) {
+    fail('missing .agents/rules/GEMINI.md');
+} else {
+    const gemini = fs.readFileSync(geminiPath, 'utf-8');
+    const requiredSnippets = [
+        { re: /RequestClass|class=`trivial`|class=\`trivial\`|`trivial`/, label: 'RequestClass / trivial class' },
+        { re: /rwcommon/i, label: 'rwcommon policy' },
+        { re: /optional/i, label: 'flexible/optional rwcommon (not always-only)' },
+        { re: /HANDOFF/, label: 'HANDOFF' },
+        { re: /SESSION/, label: 'SESSION conditional' },
+        { re: /VERIFY-PROFILES|verify_profile|mt5-code/, label: 'verify profiles' },
+        { re: /mode=`plan`|mode=\`plan\`|mode.*plan/i, label: 'mode machine' },
+    ];
+    for (const { re, label } of requiredSnippets) {
+        if (re.test(gemini)) ok(`GEMINI.md: ${label}`);
+        else fail(`GEMINI.md missing harness piece: ${label}`);
+    }
+    // Must NOT require 3 questions before ANY tool for all requests
+    if (/Every user request must pass through the Socratic Gate before ANY tool/i.test(gemini)) {
+        fail('GEMINI.md still has old always-Socratic-before-ANY-tool rule');
+    } else {
+        ok('GEMINI.md: no always-Socratic-before-ANY-tool');
+    }
+}
+
+const harnessFiles = [
+    'docs/v1.0/4-tasks/HANDOFF.template.md',
+    'docs/v1.0/4-tasks/SESSION.template.md',
+    'docs/architecture/VERIFY-PROFILES.md',
+    'docs/architecture/DESIGN-agent-harness.md',
+    'docs/architecture/ADR-003-agent-harness.md',
+];
+for (const rel of harnessFiles) {
+    if (fs.existsSync(path.join(ROOT, rel))) ok(`present ${rel}`);
+    else fail(`missing ${rel}`);
+}
+
+const orch = path.join(AGENTS_DIR, 'workflows', 'orchestrate.md');
+if (fs.existsSync(orch)) {
+    const t = fs.readFileSync(orch, 'utf-8');
+    if (/class=`orchestrate`|class=\`orchestrate\`|class.*orchestrate/i.test(t) && /HANDOFF/i.test(t) && /SESSION/i.test(t)) {
+        ok('orchestrate.md: class + HANDOFF + SESSION');
+    } else {
+        fail('orchestrate.md missing harness wiring (class/HANDOFF/SESSION)');
+    }
+}
+
+const brainstormSkill = path.join(AGENTS_DIR, 'skills', 'brainstorming', 'SKILL.md');
+if (fs.existsSync(brainstormSkill)) {
+    const t = fs.readFileSync(brainstormSkill, 'utf-8');
+    if (/Port Conflict/i.test(t)) fail('brainstorming skill still has web Port Conflict category');
+    else ok('brainstorming: no web Port Conflict');
+    if (/trivial/i.test(t) && (/bugfix/i.test(t) || /bug fix/i.test(t))) {
+        ok('brainstorming: scopes out trivial/bugfix');
+    } else {
+        warn('brainstorming: should mention skipping trivial/bugfix');
+    }
+}
+
 // --- Summary ---
 console.log('\n────────────────────────────────────────');
 if (warnings.length) console.log(chalkyWarnings(warnings.length));

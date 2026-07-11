@@ -1,156 +1,113 @@
 ---
-description: Coordinate multiple agents for full EA or cBot building lifecycle.
+description: Điều phối multi-persona (modes + HANDOFF) cho vòng đời EA/cBot đầy đủ.
 ---
 
-# /orchestrate - EA / cBot Agent Orchestration
+# /orchestrate — Orchestration EA / cBot
 
-You are now in **ORCHESTRATION MODE**. Coordinate specialized agents to solve this algorithmic trading task (MetaTrader 5 and/or cTrader).
+**Harness:** class=`orchestrate` · mode bắt đầu=`plan` · cần **SESSION.md**
 
-## Task to Orchestrate
+Nhiệm vụ:
 
 $ARGUMENTS
 
 ---
 
-## 🔴 CRITICAL: Agents Requirement
+## Nguyên tắc harness (bắt buộc)
 
-> **ORCHESTRATION = MINIMUM 2 DIFFERENT AGENTS**
->
-> **Validation before completion:**
-> - Count invoked agents
-> - If `agent_count < 2` → STOP and invoke more agents
-> - Do not use `documentation-writer` unless the user explicitly asked for documentation
+1. **Không** giả spawn nhiều process. Dùng **đổi persona + mode** + file **HANDOFF**.  
+2. **Tối thiểu 2 persona khác nhau** trên suốt lifecycle (ví dụ strategist + expert), thể hiện bằng HANDOFF/PLAN — không đếm “agent_count” ảo.  
+3. `documentation-writer` chỉ khi user **xin docs**.  
+4. Tạo/cập nhật `docs/{version}/4-tasks/SESSION.md` (template `SESSION.template.md`). Đọc version từ `docs/PROJECT_ROOT.md`.
 
-### Platform Detection (do this first)
+### Platform
 
-| Signals in the task | Platform | Dev agent |
-| ------------------- | -------- | --------- |
-| `.mq5`, `.mqh`, MT5, MQL5, RWCommon, Strategy Tester | MetaTrader 5 | `mql5-expert` |
-| cBot, cTrader, `cAlgo.API`, `.cs` robot | cTrader | `cbot-expert` |
-| Both / migrate MT5 → cBot | Dual | `mql5-expert` then `cbot-expert` (or migration-focused path via `cbot-expert` + `mt5-to-cbot-migration`) |
-| Unclear | **ASK** before Phase 2 | — |
+| Tín hiệu | Platform | Persona dev |
+| -------- | -------- | ----------- |
+| `.mq5`, MT5, RWCommon, Strategy Tester | MT5 | `mql5-expert` |
+| cBot, cAlgo, cTrader | cTrader | `cbot-expert` |
+| Migrate MT5→cBot | dual | migration qua `cbot-expert` (+ làm rõ source nếu cần) |
+| Chưa rõ | **HỎI** trước Phase 2 | — |
 
-### Agent Selection Matrix
+Xác định `rwcommon=` theo GEMINI D10 (flexible).
 
-| Task Type | REQUIRED Agents |
-| --------- | --------------- |
-| **New EA (MT5)** | `algo-strategist`, `mql5-expert`, `ea-tester` |
-| **New cBot (cTrader)** | `algo-strategist`, `cbot-expert` |
-| **New Indicator (MT5)** | `algo-strategist`, `mql5-expert` |
-| **MT5 → cBot migration** | `algo-strategist` (scope), `cbot-expert`, optional `mql5-expert` for source clarification |
-| **Fix Bug (MT5)** | `ea-tester`, `mql5-expert` |
-| **Fix Bug (cBot)** | `cbot-expert`, optional `ea-tester` for log/report reasoning |
-| **Docs only** | Do **not** use this workflow — route to `documentation-writer` |
+### Ma trận persona
+
+| Task | Persona |
+| ---- | ------- |
+| New EA MT5 | algo-strategist → mql5-expert → ea-tester |
+| New cBot | algo-strategist → cbot-expert (+ ea-tester nếu có log/report) |
+| Indicator MT5 | algo-strategist → mql5-expert |
+| Bug MT5 | ea-tester → mql5-expert (HANDOFF) |
+| Bug cBot | cbot-expert (+ ea-tester optional) |
 
 ---
 
-## 🔴 STRICT 2-PHASE ORCHESTRATION
+## PHASE 1 — PLAN (mode=`plan`)
 
-### PHASE 1: PLANNING (Sequential)
+| Bước | Persona | Việc |
+| ---- | ------- | ---- |
+| 1 | `algo-strategist` | Gate strategy; tạo `docs/{version}/3-plans/PLAN-*.md` |
+| 2 | — | Cập nhật SESSION (mode=plan, plan path, rwcommon) |
 
-| Step | Agent | Action |
-| ---- | ----- | ------ |
-| 1 | `algo-strategist` | Create versioned plan under `docs/{version}/3-plans/PLAN-*.md` (read `docs/PROJECT_ROOT.md` for version) |
+> Chỉ persona planning trong phase này. **Không code.**
 
-> 🔴 **NO OTHER AGENTS during planning!** Only `algo-strategist` applies.
-
-### ⏸️ CHECKPOINT: User Approval
+### Checkpoint
 
 ```
-After PLAN.md is complete, ASK:
-
-"✅ Plan created in docs. Do you approve? (Y/N)"
+✅ Plan đã lưu. Bạn approve để sang implement? (Y/N)
 ```
 
-> 🔴 **DO NOT proceed to Phase 2 without explicit user approval!**
-
-### PHASE 2: IMPLEMENTATION (Post-Approval)
-
-| Group | MT5 path | cBot path |
-| ----- | -------- | --------- |
-| Logic & Dev | `mql5-expert` | `cbot-expert` |
-| Verification | `ea-tester` | `ea-tester` (logic/edge-case review; cTrader reports if provided) |
-| Docs (optional) | `documentation-writer` only if user asked | same |
-
-> ✅ After user approval, route tasks sequentially to the selected agents.
-
-## Available Agents
-
-| Agent | Domain | Use when |
-| ----- | ------ | -------- |
-| `algo-strategist` | Planning | Brainstorm, logic, PRD, plan |
-| `mql5-expert` | MT5 coding | MQL5 OOP, RWCommon, indicators |
-| `cbot-expert` | cTrader coding | C# cBot, PipSize, cAlgo.API |
-| `ea-tester` | Testing | Strategy Tester, journals, error codes, edge cases |
-| `documentation-writer` | Docs | Explicit doc requests only |
+**Không** vào Phase 2 nếu chưa Y tường minh.
 
 ---
 
-## Orchestration Protocol
+## PHASE 2 — IMPLEMENT (mode=`implement`)
 
-### Step 1: Analyze Task Domains
-
-Identify ALL domains this task touches:
-
-- Planning → `algo-strategist`
-- MT5 coding → `mql5-expert`
-- cTrader coding → `cbot-expert`
-- Testing → `ea-tester`
-- Documentation (explicit only) → `documentation-writer`
-
-### Step 2: Phase Detection
-
-| If Plan Exists | Action |
-| -------------- | ------ |
-| NO `PLAN-*.md` | → PHASE 1 (planning only) |
-| YES `PLAN-*.md` + user approved | → PHASE 2 (implementation) |
-
-### Step 3: Execute Based on Phase
-
-**PHASE 1 (Planning):**  
-Use `algo-strategist` to create `PLAN.md`. STOP and ASK user.
-
-**PHASE 2 (Implementation):**  
-- MT5: `mql5-expert` writes `.mq5` / `.mqh` (RWCommon patterns).  
-- cBot: `cbot-expert` writes C# cBot (load `cbot-clean-code`, migration skill if porting).
-
-**🔴 CRITICAL: Context Passing (MANDATORY)**  
-When invoking ANY subagent, you MUST include:
-
-1. **Original User Request:** Full text.
-2. **Current Plan State:** Strategy rules and platform (MT5 / cTrader).
-3. **Constraints:** Risk, symbol, timeframe, RWCommon or cAlgo constraints from the plan.
-
-### Step 4: Verification (MANDATORY)
-
-The last verification agent should check implementation against the plan and relevant clean-code skill:
-
-- MT5 → `ea-tester` + `mql5-clean-code` / `ea-debugging-patterns`
-- cBot → `cbot-clean-code` (and `ea-tester` when logs/reports exist)
-
-### Step 5: Synthesize Results
-
-Combine all agent outputs into a unified report.
+1. Viết **HANDOFF** strategist → dev (template `HANDOFF.template.md`) nếu PLAN chưa đủ field handoff.  
+2. Persona dev (`mql5-expert` / `cbot-expert`) implement theo PLAN/HANDOFF.  
+3. Cập nhật SESSION (`mode=implement`, `last_handoff`).  
+4. Skill: tối đa 2 core + on-demand; không bulk-read references.
 
 ---
 
-## Output Format
+## PHASE 3 — REVIEW (mode=`review`)
+
+1. HANDOFF dev → `ea-tester` (hoặc tester đọc trực tiếp nếu cùng session đã có HANDOFF).  
+2. Verify profile: `mt5-code` / `cbot-code` — xem `docs/architecture/VERIFY-PROFILES.md`.  
+3. Evidence: compile/build **hoặc** `VERIFY=MANUAL`.  
+4. SESSION → `mode=done` khi DoD đạt.
+
+---
+
+## Context khi đổi persona
+
+Luôn mang theo:
+
+1. User request gốc  
+2. Path PLAN + HANDOFF  
+3. Platform + `rwcommon`  
+4. Constraints risk/symbol/TF  
+
+---
+
+## Output
 
 ```markdown
 ## 🎼 Orchestration Report
 
+🎛️ **Harness:** class=`orchestrate` · mode=`…` · …
+
 ### Overview
-[Summary of EA/cBot task + platform]
+…
 
-### Agents Invoked (MINIMUM 2)
-| # | Agent | Focus Area | Status |
-|---|-------|------------|--------|
-| 1 | algo-strategist | Strategy logic | ✅ |
-| 2 | mql5-expert or cbot-expert | Implementation | ✅ |
-| 3 | ea-tester | Verification | ✅ / ⏭️ |
+### Persona / Handoff
+| # | From → To | Handoff path | Status |
+|---|-----------|--------------|--------|
 
-### Key Findings
-1. **algo-strategist**: …
-2. **dev agent**: …
-3. **ea-tester**: …
+### Evidence
+- verify_profile=…
+- …
+
+### Next
+…
 ```

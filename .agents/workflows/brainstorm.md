@@ -1,84 +1,50 @@
 ---
-description: Structured brainstorming for trading ideas and AI predictors. Explores multiple options before implementation.
+description: Brainstorm chiến lược trading (class strategy). Không code.
 ---
 
-# /brainstorm - Trading Strategy Idea Exploration
+# /brainstorm — Strategy exploration
 
 $ARGUMENTS
 
 ---
 
-## Purpose
+## Harness
 
-This command activates BRAINSTORM mode for structured strategy exploration using the `algo-strategist`. Use when you need to explore market logic options before committing to EA implementation.
+- **class:** `strategy`  
+- **mode:** `plan` (options, chưa implement)  
+- **persona:** `algo-strategist`  
+- Skill: `brainstorming`  
+
+**Không** dùng workflow này cho `trivial` / `bugfix` / “đổi một dòng” — classify lại theo GEMINI.
 
 ---
 
 ## Behavior
 
-When `/brainstorm` is triggered:
-
-1. **Understand the goal (Socratic Gate)**
-   - ACTIVATE the `algo-strategist` agent to enforce the Socratic Gate.
-   - ASK minimum 3 questions SEQUENTIALLY to clarify: Market condition (Trend/Range/News)? Prop-firm or personal? Acceptable max drawdown?
-   - DO NOT start generating options until the user has answered these questions.
-
-2. **Generate options**
-   - Provide at least 3 different algorithmic approaches (e.g., Breakout vs Reversion).
-   - Each with pros and cons (Drawdown vs Profit Factor).
-   - Consider MQL5 limitations (Tick data vs Open Prices).
-
-3. **Compare and recommend**
-   - Summarize tradeoffs.
-   - Give a recommendation with reasoning.
+1. **Gate strategy** — hỏi lần lượt (tối thiểu): điều kiện thị trường (trend/range/news)? prop hay personal? max DD chấp nhận? symbol/TF nếu chưa có.  
+2. **Chưa** sinh options cho đến khi trả lời đủ blocking.  
+3. **≥3 hướng** algorithm (vd breakout vs reversion), mỗi hướng pros/cons (DD vs PF), giới hạn MQL5/cTrader.  
+4. **So sánh + recommend** có lý do.  
+5. Nếu chốt hướng: đề xuất ghi `docs/{version}/1-prds/` hoặc chuyển `/plan` — **lưu dưới docs/**, không yêu cầu git commit.
 
 ---
 
-## Output Format
+## Output
 
 ```markdown
 ## 🧠 Strategy Brainstorm: [Topic]
 
+🎛️ **Harness:** class=`strategy` · mode=`plan` · persona=`algo-strategist`
+
 ### Context
-[Brief problem statement]
+…
 
----
+### Option A: …
+✅ Pros / ❌ Cons / 📊 Effort: Low|Medium|High
 
-### Option A: [Name]
-[Description]
-
-✅ **Pros:**
-- [High Profit Factor, etc]
-
-❌ **Cons:**
-- [High latency risk, vulnerable to slippage]
-
-📊 **Effort to Code in MQL5:** Low | Medium | High
-
----
+### Option B: …
+…
 
 ## 💡 Recommendation
-**Option [X]** because [reasoning].
-
-What direction would you like to explore?
+…
 ```
-
----
-
-## Examples
-
-```
-/brainstorm hedging vs netting strategy
-/brainstorm dynamic lot sizing algorithms
-/brainstorm RSI and MACD entry filters
-/brainstorm RL model integration for MT5
-```
-
----
-
-## Key Principles
-
-- **No code** - this is about ideas, not implementation
-- **Visual when helpful** - use Mermaid diagrams for architecture and logic flow
-- **Honest tradeoffs** - don't hide complexity
-- **Defer to user** - present options, let them decide
