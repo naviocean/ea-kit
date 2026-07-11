@@ -17,7 +17,10 @@ const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'
 // CONSTANTS
 // ============================================================================
 
+const CLI_NAME = 'ea-kit';
 const AGENT_FOLDER = '.agents';
+/** Written into project after install so `status` can report kit identity */
+const VERSION_FILE = path.join(AGENT_FOLDER, 'ea-kit-version.json');
 
 // ============================================================================
 // UTILITIES
@@ -31,7 +34,8 @@ const showBanner = (quiet = false) => {
     if (quiet) return;
     console.log(chalk.redBright(`
     ╔══════════════════════════════════════╗
-    ║        REDWAVE LABS KIT CLI          ║
+    ║              EA-KIT CLI              ║
+    ║         RedWave Labs EA Kit          ║
     ╚══════════════════════════════════════╝
     `));
 };
@@ -65,8 +69,8 @@ const confirm = (question) => {
 };
 
 /**
- * Copy .agent folder from temp to destination
- * @param {string} sourceDir - Source directory from local npx download
+ * Copy .agents folder from package into destination
+ * @param {string} sourceDir - Source directory from package / npx cache
  * @param {string} destDir - Destination directory
  */
 const copyAgentFolder = (sourceDir, destDir) => {
@@ -75,6 +79,52 @@ const copyAgentFolder = (sourceDir, destDir) => {
     }
 
     fs.cpSync(sourceDir, destDir, { recursive: true, force: true });
+};
+
+/**
+ * Write install metadata so projects know which ea-kit version is installed
+ * @param {string} targetDir - Project root
+ */
+const writeVersionManifest = (targetDir) => {
+    const manifestPath = path.join(targetDir, VERSION_FILE);
+    const manifest = {
+        name: CLI_NAME,
+        package: pkg.name,
+        version: pkg.version,
+        installedAt: new Date().toISOString(),
+    };
+    fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf-8');
+};
+
+/**
+ * Read install metadata if present
+ * @param {string} targetDir
+ * @returns {object|null}
+ */
+const readVersionManifest = (targetDir) => {
+    const manifestPath = path.join(targetDir, VERSION_FILE);
+    if (!fs.existsSync(manifestPath)) return null;
+    try {
+        return JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+    } catch {
+        return null;
+    }
+};
+
+/**
+ * Backup existing .agents before overwrite (update/init replace)
+ * @param {string} agentDir
+ * @param {boolean} quiet
+ * @returns {string|null} backup path
+ */
+const backupAgentsFolder = (agentDir, quiet = false) => {
+    if (!fs.existsSync(agentDir)) return null;
+
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const backupDir = `${agentDir}.bak-${stamp}`;
+    fs.cpSync(agentDir, backupDir, { recursive: true });
+    log(chalk.gray(`Backup: ${backupDir}`), quiet);
+    return backupDir;
 };
 
 // ============================================================================
@@ -93,6 +143,7 @@ const initCommand = async (options) => {
     const targetDir = path.resolve(options.path || process.cwd());
     const agentDir = path.join(targetDir, AGENT_FOLDER);
     const sourcePath = path.join(__dirname, '..', AGENT_FOLDER);
+    const exists = fs.existsSync(agentDir);
 
     // Dry run mode - show what would be done
     if (dryRun) {
@@ -101,25 +152,26 @@ const initCommand = async (options) => {
         console.log(chalk.gray('────────────────────────────────────────'));
         console.log(`  1. Copy from: ${chalk.cyan(sourcePath)}`);
         console.log(`  2. Install to: ${chalk.cyan(agentDir)}`);
-        if (fs.existsSync(agentDir)) {
-            console.log(`  3. ${chalk.yellow(`Overwrite existing ${AGENT_FOLDER} folder`)}`);
+        if (exists) {
+            console.log(`  3. ${chalk.yellow(`Backup existing ${AGENT_FOLDER} then overwrite`)}`);
         }
+        console.log(`  4. Write ${chalk.cyan(VERSION_FILE)} (v${pkg.version})`);
         console.log(chalk.gray('────────────────────────────────────────\n'));
         return;
     }
 
     // Check if .agents already exists
-    if (fs.existsSync(agentDir)) {
+    if (exists) {
         if (!options.force) {
             log(chalk.yellow(`Warning: Folder ${AGENT_FOLDER} already exists at: ${agentDir}`), quiet);
-            const shouldOverwrite = await confirm('Do you want to overwrite it?');
+            const shouldOverwrite = await confirm('Do you want to backup and overwrite it?');
 
             if (!shouldOverwrite) {
                 log(chalk.gray('Operation cancelled.'), quiet);
                 process.exit(0);
             }
         }
-        log(chalk.gray(`Overwriting ${AGENT_FOLDER} folder...`), quiet);
+        log(chalk.gray(`Backing up and overwriting ${AGENT_FOLDER}...`), quiet);
     }
 
     const spinner = quiet ? null : ora({
@@ -128,21 +180,33 @@ const initCommand = async (options) => {
     }).start();
 
     try {
-        if (spinner) spinner.text = 'Copying files...';
+        if (exists) {
+            if (spinner) spinner.text = 'Backing up existing .agents...';
+            backupAgentsFolder(agentDir, true);
+        }
 
-        // Copy .agents folder natively from npx cache
+        if (spinner) spinner.text = 'Copying files...';
         copyAgentFolder(sourcePath, agentDir);
 
+        if (spinner) spinner.text = 'Writing ea-kit version manifest...';
+        writeVersionManifest(targetDir);
+
         if (spinner) {
-            spinner.succeed(chalk.green('Initialization successful!'));
+            spinner.succeed(chalk.green(`ea-kit v${pkg.version} installed successfully!`));
         }
 
         // Success message
         if (!quiet) {
             console.log(chalk.gray('\n────────────────────────────────────────'));
             console.log(chalk.white('Result:'));
+            console.log(`   ${chalk.cyan(CLI_NAME)}  v${pkg.version}`);
             console.log(`   ${chalk.cyan(AGENT_FOLDER)} → ${chalk.gray(agentDir)}`);
+            console.log(`   ${chalk.cyan(VERSION_FILE)}`);
             console.log(chalk.gray('────────────────────────────────────────'));
+            console.log(chalk.white('\nNext steps:'));
+            console.log(`   1. Append ${chalk.cyan('.agents/rules/GEMINI.md')} to your AI always-on rules`);
+            console.log(`   2. Optionally enable MCP from ${chalk.cyan('.agents/mcp_config.json')}`);
+            console.log(`   3. Use workflows: ${chalk.cyan('/brainstorm /plan /orchestrate /test')}`);
             console.log(chalk.green('\nHappy coding!\n'));
         }
     } catch (error) {
@@ -169,12 +233,12 @@ const updateCommand = async (options) => {
     // Check if .agents exists
     if (!fs.existsSync(agentDir)) {
         console.log(chalk.red(`Error: Could not find ${AGENT_FOLDER} folder at: ${targetDir}`));
-        console.log(chalk.yellow(`Tip: Run ${chalk.cyan('npx ea-kit init')} to install first.`));
+        console.log(chalk.yellow(`Tip: Run ${chalk.cyan(`npx ${CLI_NAME} init`)} to install first.`));
         process.exit(1);
     }
 
     if (!options.force && !quiet) {
-        log(chalk.yellow(`Warning: Update will overwrite the entire ${AGENT_FOLDER} folder`), quiet);
+        log(chalk.yellow(`Warning: Update will backup then overwrite the entire ${AGENT_FOLDER} folder`), quiet);
         const shouldUpdate = await confirm('Are you sure you want to continue?');
 
         if (!shouldUpdate) {
@@ -183,7 +247,7 @@ const updateCommand = async (options) => {
         }
     }
 
-    // Call init with force option
+    // Call init with force option (init always backs up when folder exists)
     await initCommand({ ...options, force: true, quiet });
 };
 
@@ -193,12 +257,13 @@ const updateCommand = async (options) => {
 const statusCommand = (options) => {
     const targetDir = path.resolve(options.path || process.cwd());
     const agentDir = path.join(targetDir, AGENT_FOLDER);
+    const manifest = readVersionManifest(targetDir);
 
-    console.log(chalk.blueBright('\nRedWave Labs Kit Status\n'));
+    console.log(chalk.blueBright(`\n${CLI_NAME} status\n`));
 
     if (fs.existsSync(agentDir)) {
         const stats = fs.statSync(agentDir);
-        
+
         // Count files recursively
         let filesCount = 0;
         const countFiles = (dir) => {
@@ -216,13 +281,26 @@ const statusCommand = (options) => {
 
         console.log(chalk.green('[OK] Installed'));
         console.log(chalk.gray('────────────────────────────────────────'));
+        console.log(`CLI:      ${chalk.cyan(CLI_NAME)}`);
+        console.log(`Package:  ${chalk.cyan(pkg.name)}@${chalk.yellow(pkg.version)} (this binary)`);
+        if (manifest?.version) {
+            console.log(`Project:  ${chalk.cyan(manifest.name || CLI_NAME)}@${chalk.yellow(manifest.version)} (in ${AGENT_FOLDER})`);
+            if (manifest.installedAt) {
+                console.log(`Installed:${chalk.gray(` ${manifest.installedAt}`)}`);
+            }
+            if (manifest.version !== pkg.version) {
+                console.log(chalk.yellow(`Note:     Project kit version differs from this CLI. Run: npx ${CLI_NAME} update`));
+            }
+        } else {
+            console.log(chalk.yellow(`Project:  (no ${VERSION_FILE} — run npx ${CLI_NAME} update to stamp version)`));
+        }
         console.log(`Path:     ${chalk.cyan(agentDir)}`);
         console.log(`Modified: ${chalk.gray(stats.mtime.toLocaleString('en-US'))}`);
         console.log(`Files:    ${chalk.yellow(filesCount)} items`);
         console.log(chalk.gray('────────────────────────────────────────\n'));
     } else {
         console.log(chalk.red('[X] Not installed'));
-        console.log(chalk.yellow(`Run ${chalk.cyan('npx ea-kit init')} to install.\n`));
+        console.log(chalk.yellow(`Run ${chalk.cyan(`npx ${CLI_NAME} init`)} to install.\n`));
     }
 };
 
@@ -233,8 +311,8 @@ const statusCommand = (options) => {
 const program = new Command();
 
 program
-    .name('ea-kit')
-    .description('CLI tool to install and manage RedWave Labs Agent Kit')
+    .name(CLI_NAME)
+    .description('Install and manage the RedWave Labs EA Agent Kit (.agents)')
     .version(pkg.version, '-v, --version', 'Display version number');
 
 // Command: init
@@ -250,7 +328,7 @@ program
 // Command: update
 program
     .command('update')
-    .description('Update .agents folder to the latest version')
+    .description('Backup and update .agents folder to this CLI version')
     .option('-f, --force', 'Skip confirmation prompt', false)
     .option('-p, --path <dir>', 'Path to the project directory', process.cwd())
     .option('-q, --quiet', 'Suppress output (for CI/CD)', false)
@@ -260,7 +338,7 @@ program
 // Command: status
 program
     .command('status')
-    .description('Check installation status')
+    .description('Check ea-kit installation status')
     .option('-p, --path <dir>', 'Path to the project directory', process.cwd())
     .action(statusCommand);
 

@@ -1,10 +1,10 @@
 {
-  "name": "redwavelabs-kit",
-  "version": "1.0.0",
-  "description": "AI Agent templates - Skills, Agents, and Workflows",
+  "name": "ea-kit",
+  "version": "1.0.1",
+  "description": "RedWave Labs EA Agent Kit — skills, agents, and workflows for MQL5 & cTrader",
   "type": "module",
   "bin": {
-    "redwavelabs-kit": "./bin/cli.js"
+    "ea-kit": "./bin/cli.js"
   },
   "files": [
     ".agents",
@@ -15,21 +15,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/naviocean/redwavelabs-kit.git"
+    "url": "git+https://github.com/naviocean/ea-kit.git"
   },
-  "homepage": "https://github.com/naviocean/redwavelabs-kit#readme",
+  "homepage": "https://github.com/naviocean/ea-kit#readme",
   "bugs": {
-    "url": "https://github.com/naviocean/redwavelabs-kit/issues"
+    "url": "https://github.com/naviocean/ea-kit/issues"
   },
   "keywords": [
-    "antigravity",
+    "ea-kit",
+    "mql5",
+    "ctrader",
+    "metatrader",
     "ai",
     "agent",
-    "gemini",
     "skills",
-    "templates",
     "workflows",
-    "boilerplate"
+    "redwave"
   ],
   "author": "naviocean",
   "license": "MIT",

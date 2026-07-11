@@ -6,20 +6,28 @@ Standard AI Agent kit for RedWave Labs internal algorithmic trading projects —
 
 ### Option A — CLI (recommended)
 
+Package and binary name: **`ea-kit`** (repo: `github.com/naviocean/ea-kit`).
+
 From the target project root:
 
 ```bash
 # Install .agents into the current project
-npx redwavelabs-kit init
+npx ea-kit init
 
-# Or if published/linked as ea-kit:
-# npx ea-kit init
+npx ea-kit status
+npx ea-kit update   # backs up then overwrites .agents — confirm first
+```
 
-npx redwavelabs-kit status
-npx redwavelabs-kit update   # overwrites .agents — confirm first
+Local dev (this repo):
+
+```bash
+npm link          # exposes `ea-kit` on PATH
+ea-kit init -p /path/to/your-ea-project
 ```
 
 Useful flags: `-p <dir>`, `-f` / `--force`, `-q` / `--quiet`, `--dry-run`.
+
+After install, the project gets `.agents/ea-kit-version.json` (name + version + install time).
 
 ### Option B — Manual copy
 
