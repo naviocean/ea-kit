@@ -23,7 +23,7 @@ $ARGUMENTS
 ## CRITICAL
 
 1. Luôn persona `ea-tester`.  
-2. Skill: `ea-debugging-patterns` (+ docs research nếu mã lỗi lạ).  
+2. Skills: `strategy-tester-analysis` (report/metrics); `ea-debugging-patterns` (journal/retcode); `prop-firm-constraints` nếu prop.  
 3. Tập trung platform trading: MT5 codes (10016, 4756, 10013), DD, PF, modify spam; cBot theo log user cung cấp.  
 4. **Không** tự nhảy sang sửa code im lặng. Cần fix → viết **HANDOFF** sang `mql5-expert` / `cbot-expert`.
 

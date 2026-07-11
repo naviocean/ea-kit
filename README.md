@@ -74,6 +74,7 @@ cTrader uses `cbot-clean-code` / migration skills — not MQL5/RWCommon.
 - **Class-based gates:** Full Socratic only for strategy/orchestrate — not every one-line fix.
 - **Modes + HANDOFF:** Multi-role via durable files (not fake multi-process agents).
 - **Skill tiers:** Core (≤2) + on-demand + single reference file.
+- **Domain skills:** `trading-requirements`, `prop-firm-constraints`, `strategy-tester-analysis` (strategist/tester).
 - **Workflows:** `/brainstorm`, `/plan`, `/orchestrate`, `/test` — see `.agents/workflows/README.md`.
 - **Docs layout:** Versioned `docs/{version}/…` per `documentation-standards`.
 

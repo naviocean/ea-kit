@@ -104,12 +104,14 @@ Path: `docs/{version}/4-tasks/SESSION.md` — template `SESSION.template.md`.
 | T2 On-demand | Keyword/lỗi khớp | Chỉ skill liên quan (indicator, 10016, migration…) |
 | T3 Reference | Cần API chi tiết | Mở **một** file trong `references/` — **cấm** đọc cả tree |
 
-Gợi ý core:
+Gợi ý core / on-demand:
 
-- `mql5-expert`: `mql5-clean-code` + (`rwcommon-library-patterns` **nếu** `rwcommon=required`)  
-- `cbot-expert`: `cbot-clean-code` (+ migration on-demand)  
-- `ea-tester`: `ea-debugging-patterns`  
-- `algo-strategist`: `brainstorming` khi class `strategy`|`feature`|`orchestrate`  
+- `mql5-expert`: core `mql5-clean-code` + (`rwcommon-library-patterns` **nếu** `rwcommon=required`)  
+- `cbot-expert`: core `cbot-clean-code` (+ migration on-demand)  
+- `ea-tester`: core `strategy-tester-analysis` + `ea-debugging-patterns`; prop → `prop-firm-constraints`  
+- `algo-strategist`: core `trading-requirements` (+ `brainstorming` khi strategy mơ hồ); prop → `prop-firm-constraints`  
+
+Domain skills bổ sung: `prop-firm-constraints`, `strategy-tester-analysis`, `trading-requirements` (thay bundle PM web generic cho EA).
 
 ---
 

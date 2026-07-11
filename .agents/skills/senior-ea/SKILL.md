@@ -21,10 +21,16 @@ This is a master index of skills for RedWave EA / cBot development. **Do not tre
 - **MT5 → cBot migration**: `@[.agents/skills/mt5-to-cbot-migration/SKILL.md]`
 - **cTrader MCP servers**: `@[.agents/skills/ctrader-mcp-servers/SKILL.md]`
 
+### Strategy, risk & testing
+
+- **Trading requirements (PRD for EA/cBot)**: `@[.agents/skills/trading-requirements/SKILL.md]`
+- **Prop-firm constraints**: `@[.agents/skills/prop-firm-constraints/SKILL.md]`
+- **Strategy Tester / robustness analysis**: `@[.agents/skills/strategy-tester-analysis/SKILL.md]`
+
 ### Process & docs
 
 - **Docs layout (PRD / plan / reports / ADR)**: `@[.agents/skills/documentation-standards/SKILL.md]`
 - **Brainstorming / Socratic gate**: `@[.agents/skills/brainstorming/SKILL.md]`
 - **Code graph / impact (when GitNexus available)**: `@[.agents/skills/gitnexus-intelligence/SKILL.md]`
 
-If you need to execute trades on MT5, DO NOT write Core API order code directly unless necessary. Prefer `rwcommon-library-patterns`.
+If you need to execute trades on MT5, DO NOT write Core API order code directly unless necessary when RWCommon is required. Prefer `rwcommon-library-patterns`.

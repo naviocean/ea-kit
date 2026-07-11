@@ -21,7 +21,7 @@ $ARGUMENTS
 
 1. **KHÔNG viết code** EA/cBot — chỉ plan/PRD.  
 2. Gate theo class (strategy = Socratic symbol/TF/risk/edge).  
-3. Skills: `brainstorming` (nếu mơ hồ), `plan-writing`, `documentation-standards`.  
+3. Skills: `trading-requirements`; `brainstorming` (nếu mơ hồ); `prop-firm-constraints` (nếu prop); `plan-writing`; `documentation-standards`.  
 4. RWCommon: ghi rõ dự kiến `required|optional` trong plan (detect project nếu đã có code).
 
 ---
