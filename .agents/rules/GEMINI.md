@@ -27,9 +27,14 @@ trigger: always_on
 2. **Wait:** Do NOT invoke subagents, write code, or create files until the user explicitly clears the Gate.
 3. **Reference:** Full implementation of this protocol must follow `@[.agents/skills/brainstorming/SKILL.md]`.
 
-### 🔍 Code Search Hierarchy (MANDATORY)
-1. **First Attempt (Graph Search):** You MUST ALWAYS use `mcp_gitnexus_query` and `mcp_gitnexus_context` first to explore functionality, execution flows, and symbol references. DO NOT use `grep_search` or `find_by_name` to understand code flow.
-2. **Fallback Attempt (Text Search):** ONLY IF GitNexus returns 0 results, OR you are searching for literal strings, arbitrary text or logs, you are THEN allowed to fallback to `grep_search` and `find_by_name`.
+### 🔍 Code Search Hierarchy (PREFERRED + GRACEFUL FALLBACK)
+
+Follow `@[.agents/skills/gitnexus-intelligence/SKILL.md]`. GitNexus is **preferred**, not a hard gate.
+
+1. **Probe availability once** (e.g. list repos / graph context). If MCP is missing, times out, or the project is not indexed → **DEGRADED mode**: use normal read/grep/glob tools, warn briefly once, and **continue**. Do not block the task.
+2. **GRAPH mode:** Prefer graph query/context for architecture, call flow, and blast radius before non-trivial edits.
+3. **Always OK to use text search immediately** for: literal strings, logs, Strategy Tester reports, filenames the user already gave, or greenfield files that do not exist in any index.
+4. **Never invent graph results.** Never refuse a bugfix solely because GitNexus is unavailable.
 
 ---
 
@@ -78,7 +83,7 @@ We do not preload massive framework documentation. Instead, Agents will dynamica
 ### Global Workspace Skills (Shared)
 
 - `documentation-standards`: ALL Agents generating PRDs, Plans, Tasks, or Docs MUST adhere to the versioned `docs/` structure and templates.
-- `gitnexus-intelligence`: ALL Agents MUST use this to verify impact (blast radius) before editing, debugging, or refactoring ANY code.
+- `gitnexus-intelligence`: Prefer this for impact/blast radius when GitNexus is available; use manual search fallback when not (see skill).
 - `clean-code`: Global coding standards.
 
 ### Domain-Specific Skills (Triggered by context)
@@ -124,10 +129,10 @@ When user says "final checks", "review", or indicates completion, perform a high
 Priority Execution Order:
 
 1. **Logic Validation** (Are inputs mapped correctly to rules?)
-2. **Risk Compliance** (Is RiskManager called prior to Opening?)
+2. **Risk Compliance** (Is RiskManager called prior to Opening? — MT5/RWCommon path)
 3. **Loop Overflows** (Are OnCalculate/OnTick loops optimal? No endless modification!)
-4. **GitNexus Impact** (Did you run impact analysis and detect changes scope? No HIGH/CRITICAL unhandled risk allowed)
-5. **Post-Task Graph Update:** Upon task completion or before finishing a heavy refactor, the Agent MUST proactively use the `run_command` tool to execute `npx gitnexus analyze` (or `npx gitnexus analyze --embeddings` if embeddings exist) to keep the codebase index fresh.
+4. **Impact / blast radius** (GitNexus impact **or** manual caller/include search in DEGRADED mode. No HIGH/CRITICAL risk left unhandled when known.)
+5. **Post-Task Graph Update (optional):** If GitNexus is in use for this project, suggest or run `npx gitnexus analyze` (add `--embeddings` if embeddings exist) after heavy refactors. Skip silently if GitNexus is not part of the workspace.
 
 > 🔴 **Agents & Skills can invoke automated runner scripts** if available or present a checklist for manual verification.
-> **Git Hook Recommendation:** Suggest the user to execute `git commit` to offload the re-indexing to a background post-commit hook if available.
+> **Git Hook Recommendation:** If the project uses GitNexus hooks, suggest `git commit` so re-indexing can run in the background.

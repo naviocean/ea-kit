@@ -70,11 +70,23 @@ cTrader work uses `cbot-clean-code`, `mt5-to-cbot-migration`, and related skills
   rules/        # Global always-on rules (GEMINI.md)
   mcp_config.json
 bin/            # CLI (init / update / status)
+scripts/        # Kit self-test (npm test)
 docs/           # Kit-level docs pointer (PROJECT_ROOT.md)
-others/         # Legacy / non-shipped scratch (not part of package install)
+others/         # Legacy / non-shipped — see others/README.md
 ```
 
-`package.json` ships only `.agents` and `bin` when installed via npm/npx.
+`package.json` ships `.agents`, `bin`, and `scripts` when installed via npm/npx. The `others/` folder is **legacy scratch and is not shipped**.
+
+## Kit self-test
+
+From this repository:
+
+```bash
+npm test
+# same as: node scripts/verify-kit.mjs
+```
+
+Checks: expected agents/workflows, agent → skill paths, no monorepo/web ghost agents, package name `ea-kit`.
 
 ---
 

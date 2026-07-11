@@ -1,102 +1,122 @@
 ---
 name: gitnexus-intelligence
-description: MANDATORY FIRST STEP for ANY code search, exploration, debugging, or refactoring. Trigger this skill IMMEDIATELY whenever the user asks to search code, explore how things work, find a bug, debug, or understand architecture. Replaces traditional grep search with Graph MCP.
+description: Preferred first step for code search, exploration, debugging, or refactoring when GitNexus MCP is available. Prefer graph tools; gracefully fall back to text search if MCP is unavailable or the repo is not indexed.
 ---
 
-# GitNexus — Code Intelligence
+# GitNexus — Code Intelligence (Graceful)
 
-This project is indexed by GitNexus as **boilerplate**. Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+Use GitNexus MCP tools to understand code, assess impact, and navigate safely **when the graph is available**. This skill does **not** hard-block work if GitNexus is missing.
 
-> If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
+> If any GitNexus tool warns the index is stale, prefer `npx gitnexus analyze` when the user can run it — then continue.
 
-## Always Do
+## Availability protocol (do this first)
 
-- **MANDATORY PING CHECK:** Before doing any code investigation or modification, the Agent MUST "ping" the GitNexus MCP server (e.g., by calling `mcp_gitnexus_list_repos`). If the tool call fails, times out, or returns no valid indexed repositories, the Agent MUST STOP immediately, notify the user that "GitNexus MCP is not responding or not indexed," and ask the user to fix the MCP connection or run `npx gitnexus analyze` before proceeding.
-- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `gitnexus_impact({target: "symbolName", direction: "upstream"})` and report the blast radius (direct callers, affected processes, risk level) to the user.
-- **MUST run `gitnexus_detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows.
-- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.
-- When exploring unfamiliar code, use `gitnexus_query({query: "concept"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.
-- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `gitnexus_context({name: "symbolName"})`.
+1. **Probe once** (e.g. `list_repos` / `mcp_gitnexus_list_repos` or open `gitnexus://repo/.../context`).
+2. **Classify mode:**
+
+| Mode | Condition | Behavior |
+| ---- | --------- | -------- |
+| **GRAPH** | MCP responds and current project (or known alias) is indexed | Prefer GitNexus for search, impact, rename |
+| **DEGRADED** | MCP missing, timeout, 0 repos, or project not indexed | Use normal read/grep/glob tools; **one short warn** to the user; continue work |
+| **STALE** | Graph works but index is stale | Warn; offer `npx gitnexus analyze`; continue with graph + extra caution, or text search |
+
+3. **Never STOP the entire task** solely because GitNexus is unavailable. Greenfield EAs, small edits, and log analysis must still proceed in DEGRADED mode.
+
+```
+❌ WRONG: "GitNexus not responding — I cannot proceed until you fix MCP."
+✅ RIGHT: "GitNexus unavailable — continuing with file/text search. Impact analysis will be manual."
+```
+
+## When in GRAPH mode
+
+- **Prefer impact analysis before editing** non-trivial symbols: `gitnexus_impact({target, direction: "upstream"})` and report blast radius.
+- **Prefer `gitnexus_detect_changes()`** before committing when the tool exists.
+- **Warn** on HIGH/CRITICAL impact before large edits.
+- Explore with `gitnexus_query` / `gitnexus_context` instead of blind grep for architecture questions.
+- Renames: prefer `gitnexus_rename` with `dry_run: true` first when available.
+
+## When in DEGRADED mode
+
+- Use the host's normal tools: read, grep, glob, terminal search.
+- For edits: manual impact check — find callers/includes by name, list `#include` / `using`, note shared modules (e.g. RWCommon).
+- For renames: careful multi-file search/replace; list files touched.
+- Do **not** invent fake GitNexus results.
+- Optionally suggest: enable MCP from `.agents/mcp_config.json` and run `npx gitnexus analyze`.
 
 ## When Debugging
 
-1. `gitnexus_query({query: "<error or symptom>"})` — find execution flows related to the issue
-2. `gitnexus_context({name: "<suspect function>"})` — see all callers, callees, and process participation
-3. `READ gitnexus://repo/boilerplate/process/{processName}` — trace the full execution flow step by step
-4. For regressions: `gitnexus_detect_changes({scope: "compare", base_ref: "main"})` — see what your branch changed
+**GRAPH:**
+
+1. `gitnexus_query({query: "<error or symptom>"})`
+2. `gitnexus_context({name: "<suspect function>"})`
+3. Process resources if useful
+4. Regressions: `gitnexus_detect_changes` when available
+
+**DEGRADED:**
+
+1. Grep error strings / function names in journals and source
+2. Read suspect modules and call sites
+3. Diff against main/base branch if needed
 
 ## When Refactoring
 
-- **Renaming**: MUST use `gitnexus_rename({symbol_name: "old", new_name: "new", dry_run: true})` first. Review the preview — graph edits are safe, text_search edits need manual review. Then run with `dry_run: false`.
-- **Extracting/Splitting**: MUST run `gitnexus_context({name: "target"})` to see all incoming/outgoing refs, then `gitnexus_impact({target: "target", direction: "upstream"})` to find all external callers before moving code.
-- After any refactor: run `gitnexus_detect_changes({scope: "all"})` to verify only expected files changed.
+| Action | GRAPH | DEGRADED |
+| ------ | ----- | -------- |
+| Rename | `gitnexus_rename` dry-run then apply | Grep + careful replace; confirm with user if wide |
+| Extract/split | `context` + `impact` first | Read callers manually via search |
+| Pre-finish | `detect_changes` | `git status` / `git diff` review |
 
-## Never Do
+## Never do (both modes)
 
-- NEVER edit a function, class, or method without first running `gitnexus_impact` on it.
-- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.
-- NEVER rename symbols with find-and-replace — use `gitnexus_rename` which understands the call graph.
-- NEVER commit changes without running `gitnexus_detect_changes()` to check affected scope.
+- NEVER ignore HIGH/CRITICAL risk **when impact was actually computed**.
+- NEVER claim "zero blast radius" without evidence (graph or manual search).
+- NEVER block trivial fixes (typos, comments, single-file pure locals) waiting for GitNexus.
 
-## Tools Quick Reference
+## Tools quick reference (GRAPH)
 
-| Tool | When to use | Command |
-|------|-------------|---------|
-| `query` | Find code by concept | `gitnexus_query({query: "auth validation"})` |
-| `context` | 360-degree view of one symbol | `gitnexus_context({name: "validateUser"})` |
-| `impact` | Blast radius before editing | `gitnexus_impact({target: "X", direction: "upstream"})` |
-| `detect_changes` | Pre-commit scope check | `gitnexus_detect_changes({scope: "staged"})` |
-| `rename` | Safe multi-file rename | `gitnexus_rename({symbol_name: "old", new_name: "new", dry_run: true})` |
-| `cypher` | Custom graph queries | `gitnexus_cypher({query: "MATCH ..."})` |
+| Tool | When to use |
+|------|-------------|
+| `query` | Find code by concept |
+| `context` | 360° view of one symbol |
+| `impact` | Blast radius before editing |
+| `detect_changes` | Pre-commit scope check |
+| `rename` | Safe multi-file rename |
+| `cypher` | Custom graph queries |
 
-## Impact Risk Levels
+## Impact risk levels (when impact ran)
 
 | Depth | Meaning | Action |
 |-------|---------|--------|
-| d=1 | WILL BREAK — direct callers/importers | MUST update these |
-| d=2 | LIKELY AFFECTED — indirect deps | Should test |
-| d=3 | MAY NEED TESTING — transitive | Test if critical path |
+| d=1 | WILL BREAK — direct callers | MUST update |
+| d=2 | LIKELY AFFECTED | Should test |
+| d=3 | MAY NEED TESTING | Test if critical path |
 
-## Resources
+## Self-check before finishing code edits
 
-| Resource | Use for |
-|----------|---------|
-| `gitnexus://repo/boilerplate/context` | Codebase overview, check index freshness |
-| `gitnexus://repo/boilerplate/clusters` | All functional areas |
-| `gitnexus://repo/boilerplate/processes` | All execution flows |
-| `gitnexus://repo/boilerplate/process/{name}` | Step-by-step execution trace |
+1. Impact considered (graph **or** manual caller search)
+2. No known HIGH/CRITICAL risks left unaddressed
+3. Changes match expected scope (`detect_changes` or `git diff`)
+4. Direct dependents updated when signatures change
 
-## Self-Check Before Finishing
+## Keeping the index fresh (optional, GRAPH projects)
 
-Before completing any code modification task, verify:
-1. `gitnexus_impact` was run for all modified symbols
-2. No HIGH/CRITICAL risk warnings were ignored
-3. `gitnexus_detect_changes()` confirms changes match expected scope
-4. All d=1 (WILL BREAK) dependents were updated
-
-## Keeping the Index Fresh
-
-After committing code changes, the GitNexus index becomes stale. Re-run analyze to update it:
+After substantial commits:
 
 ```bash
 npx gitnexus analyze
-```
-
-If the index previously included embeddings, preserve them by adding `--embeddings`:
-
-```bash
+# preserve embeddings if used:
 npx gitnexus analyze --embeddings
 ```
 
-To check whether embeddings exist, inspect `.gitnexus/meta.json` — the `stats.embeddings` field shows the count (0 means no embeddings). **Running analyze without `--embeddings` will delete any previously generated embeddings.**
+Check `.gitnexus/meta.json` → `stats.embeddings` before dropping embeddings.
 
-## CLI
+## Related skills
 
-| Task | Read this skill file |
-|------|---------------------|
-| Understand architecture / "How does X work?" | `.agents/skills/gitnexus/gitnexus-exploring/SKILL.md` |
-| Blast radius / "What breaks if I change X?" | `.agents/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |
-| Trace bugs / "Why is X failing?" | `.agents/skills/gitnexus/gitnexus-debugging/SKILL.md` |
-| Rename / extract / split / refactor | `.agents/skills/gitnexus/gitnexus-refactoring/SKILL.md` |
-| Tools, resources, schema reference | `.agents/skills/gitnexus/gitnexus-guide/SKILL.md` |
-| Index, status, clean, wiki CLI commands | `.agents/skills/gitnexus/gitnexus-cli/SKILL.md` |
+| Task | Skill |
+|------|-------|
+| Architecture / how X works | `.agents/skills/gitnexus/gitnexus-exploring/SKILL.md` |
+| Blast radius | `.agents/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |
+| Debugging | `.agents/skills/gitnexus/gitnexus-debugging/SKILL.md` |
+| Refactoring | `.agents/skills/gitnexus/gitnexus-refactoring/SKILL.md` |
+| Tools reference | `.agents/skills/gitnexus/gitnexus-guide/SKILL.md` |
+| CLI index/status | `.agents/skills/gitnexus/gitnexus-cli/SKILL.md` |

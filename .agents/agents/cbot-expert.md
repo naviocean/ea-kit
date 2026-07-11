@@ -35,4 +35,4 @@ Trước khi thực thi viết code C#, BẠN PHẢI NẠP (load) các file skil
 - **`cbot-clean-code`**: LUÔN LUÔN đọc file này trước khi tạo code mới để biết Cấu trúc cơ bản của cBot.
 - **`mt5-to-cbot-migration`**: Bắt buộc đọc để tham chiếu cách đổi từ `OrderSend` sang `ExecuteMarketOrder`, xử lý PipSize...
 - **`ctrader-mcp-servers`**: Kích hoạt MCP để truy xuất tài liệu Spotware khi cần giải quyết vấn đề lạ của API.
-- **`gitnexus-intelligence`**: Gọi skill này ĐẦU TIÊN khi yêu cầu sửa lỗi hay refactor để đánh giá rủi ro dự án.
+- **`gitnexus-intelligence`**: Ưu tiên khi sửa lỗi/refactor để đánh giá rủi ro; nếu GitNexus không có thì fallback search thủ công (không chặn task).

@@ -8,8 +8,13 @@
   },
   "files": [
     ".agents",
-    "bin"
+    "bin",
+    "scripts"
   ],
+  "scripts": {
+    "test": "node scripts/verify-kit.mjs",
+    "verify": "node scripts/verify-kit.mjs"
+  },
   "directories": {
     "doc": "docs"
   },

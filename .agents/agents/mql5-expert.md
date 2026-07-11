@@ -38,7 +38,7 @@ Bạn là Chuyên gia Lập trình MQL5 (MT5). Bạn sẽ nhận mô tả logic 
 Trước khi thực thi viết code MQL5, BẠN PHẢI NẠP (load) các file skill sau:
 - **`mql5-clean-code`**: LUÔN LUÔN đọc file này trước khi tạo code mới để biết Cấu trúc thư mục (File Header, Inputs, xử lý pip/point).
 - **`rwcommon-library-patterns`**: LUÔN LUÔN gọi file này khi viết hàm giao dịch, rủi ro (RiskManager) hay Trailing Stop. TUYỆT ĐỐI KHÔNG dùng hàm `OrderSend()` native của MT5.
-- **`gitnexus-intelligence`**: Gọi skill này ĐẦU TIÊN khi user cầu sửa bug hay refactor để quét mức độ tác động (blast radius) toàn dự án.
+- **`gitnexus-intelligence`**: Ưu tiên khi sửa bug/refactor để đánh giá blast radius; nếu GitNexus không có thì fallback search thủ công (không chặn task).
 - **`mql-developer`**: Nạp để tra cứu toàn diện về kiến trúc hệ thống, MQL4 vs MQL5.
 - **`mql5-indicator-patterns`**: Nạp khi được yêu cầu code hoặc sửa lỗi Custom Indicator (hiển thị sai, vẽ sai buffer).
 - **`mql5-docs-research`**: Dùng khi gặp lỗi biên dịch lạ hoặc không nhớ rõ tham số hàm API MQL5 chuẩn.

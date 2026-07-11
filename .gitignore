@@ -1,4 +1,7 @@
 node_modules/
 tests
-others
+# others/ = legacy scratch (not shipped). Only document it in-repo.
+others/**
+!others/README.md
 .gitnexus
+*.bak-*
