@@ -179,9 +179,9 @@ Based on your request for [DOMAIN] [FEATURE]:
 
 ## 🔄 Iterative Questioning
 
-### First Pass (3-5 Questions)
+### First Pass (up to 3-5 turns)
 
-Focus on **blocking decisions**. Don't proceed without answers.
+Focus on **blocking decisions**. Ask exactly one question per turn, wait for its answer, and use that answer to decide whether another blocking question remains. Don't proceed without the required answers.
 
 ### Second Pass (After Initial Implementation)
 

@@ -15,14 +15,14 @@ $ARGUMENTS
 - **persona:** `algo-strategist`  
 - Skill: `brainstorming`  
 
-**Không** dùng workflow này cho `trivial` / `bugfix` / “đổi một dòng” — classify lại theo GEMINI.
+**Không** dùng workflow này cho `trivial` / `bugfix` / “đổi một dòng” — classify lại theo `EA-KIT.md`.
 
 ---
 
 ## Behavior
 
-1. **Gate strategy** — hỏi lần lượt (tối thiểu): điều kiện thị trường (trend/range/news)? prop hay personal? max DD chấp nhận? symbol/TF nếu chưa có.  
-2. **Chưa** sinh options cho đến khi trả lời đủ blocking.  
+1. **Gate strategy** — mỗi message chỉ hỏi **một** câu P0. Bắt đầu từ quyết định chặn lớn nhất; sau câu trả lời mới hỏi lần lượt market regime, prop/personal, max DD, hoặc symbol/TF nếu vẫn còn blocking.
+2. **Chưa** sinh options cho đến khi trả lời đủ blocking; không gửi một danh sách câu hỏi trong cùng message.
 3. **≥3 hướng** algorithm (vd breakout vs reversion), mỗi hướng pros/cons (DD vs PF), giới hạn MQL5/cTrader.  
 4. **So sánh + recommend** có lý do.  
 5. Nếu chốt hướng: đề xuất ghi `docs/{version}/1-prds/` hoặc chuyển `/plan` — **lưu dưới docs/**, không yêu cầu git commit.

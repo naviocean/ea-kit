@@ -21,6 +21,12 @@ const CLI_NAME = 'ea-kit';
 const AGENT_FOLDER = '.agents';
 /** Written into .agents after install so `status` can report kit identity */
 const VERSION_FILE = 'ea-kit-version.json';
+const HOST_ADAPTERS = {
+    codex: { source: ['adapters', 'codex', 'AGENTS.md'], destination: ['AGENTS.md'] },
+    claude: { source: ['adapters', 'claude', 'CLAUDE.md'], destination: ['CLAUDE.md'] },
+    cursor: { source: ['adapters', 'cursor', 'ea-kit.mdc'], destination: ['.cursor', 'rules', 'ea-kit.mdc'] },
+    gemini: { source: ['rules', 'GEMINI.md'], destination: ['GEMINI.md'] },
+};
 
 // ============================================================================
 // UTILITIES
@@ -145,6 +151,22 @@ const createStagedAgentsFolder = (targetDir, sourcePath) => {
     return { stageRoot, stagedAgents };
 };
 
+const hasFileWithExtension = (dir, extension) => {
+    if (!fs.existsSync(dir)) return false;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (['.git', 'node_modules', AGENT_FOLDER].includes(entry.name)) continue;
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isFile() && entry.name.endsWith(extension)) return true;
+        if (entry.isDirectory() && hasFileWithExtension(fullPath, extension)) return true;
+    }
+    return false;
+};
+
+const printCheck = (ok, label, detail = '') => {
+    const marker = ok ? chalk.green('[OK]') : chalk.yellow('[WARN]');
+    console.log(`${marker} ${label}${detail ? chalk.gray(` — ${detail}`) : ''}`);
+};
+
 // ============================================================================
 // COMMANDS
 // ============================================================================
@@ -232,9 +254,10 @@ const initCommand = async (options) => {
             console.log(`   ${chalk.cyan(VERSION_FILE)}`);
             console.log(chalk.gray('────────────────────────────────────────'));
             console.log(chalk.white('\nNext steps:'));
-            console.log(`   1. Append ${chalk.cyan('.agents/rules/GEMINI.md')} to your AI always-on rules`);
-            console.log(`   2. Optionally enable MCP from ${chalk.cyan('.agents/mcp_config.json')}`);
-            console.log(`   3. Use workflows: ${chalk.cyan('/brainstorm /plan /orchestrate /test')}`);
+            console.log(`   1. Run ${chalk.cyan(`${CLI_NAME} doctor`)} to inspect setup`);
+            console.log(`   2. Add a host adapter: ${chalk.cyan(`${CLI_NAME} link-host codex`)}`);
+            console.log(`   3. Optionally enable MCP from ${chalk.cyan('.agents/mcp_config.json')}`);
+            console.log(`   4. Use workflows: ${chalk.cyan('/brainstorm /plan /orchestrate /test')}`);
             console.log(chalk.green('\nHappy coding!\n'));
         }
     } catch (error) {
@@ -342,6 +365,68 @@ const statusCommand = (options) => {
     }
 };
 
+const doctorCommand = (options) => {
+    const targetDir = path.resolve(options.path || process.cwd());
+    const agentDir = path.join(targetDir, AGENT_FOLDER);
+    const nodeMajor = Number.parseInt(process.versions.node.split('.')[0], 10);
+    const manifest = readVersionManifest(agentDir);
+    const checks = [
+        [nodeMajor >= 20, 'Node.js >= 20', process.versions.node],
+        [fs.existsSync(agentDir), '.agents installed', agentDir],
+        [fs.existsSync(path.join(agentDir, 'rules', 'EA-KIT.md')), 'portable core rules', '.agents/rules/EA-KIT.md'],
+        [Boolean(manifest?.version), 'version manifest', manifest?.version || 'run ea-kit update to stamp it'],
+    ];
+    const hostFiles = [
+        ['Codex', path.join(targetDir, 'AGENTS.md')],
+        ['Claude Code', path.join(targetDir, 'CLAUDE.md')],
+        ['Cursor', path.join(targetDir, '.cursor', 'rules', 'ea-kit.mdc')],
+        ['Gemini', path.join(targetDir, 'GEMINI.md')],
+    ];
+
+    console.log(chalk.blueBright(`\n${CLI_NAME} doctor\n`));
+    for (const [ok, label, detail] of checks) printCheck(ok, label, detail);
+    for (const [host, file] of hostFiles) printCheck(fs.existsSync(file), `${host} adapter`, path.relative(targetDir, file));
+
+    const hasMql5 = hasFileWithExtension(targetDir, '.mq5') || hasFileWithExtension(targetDir, '.mqh');
+    const hasCsharp = hasFileWithExtension(targetDir, '.cs');
+    const hasRwCommon = fs.existsSync(path.join(targetDir, 'Include', 'RWCommon'));
+    const platform = hasMql5 && hasCsharp ? 'MT5 + C#' : hasMql5 ? 'MT5' : hasCsharp ? 'C# / cBot candidate' : 'no platform source found';
+    printCheck(hasMql5 || hasCsharp, 'platform source detected', platform);
+    printCheck(hasRwCommon, 'RWCommon detected', hasRwCommon ? 'rwcommon=required' : 'rwcommon=optional unless project/user overrides');
+
+    if (options.strict && checks.some(([ok]) => !ok)) process.exitCode = 1;
+};
+
+const linkHostCommand = (host, options) => {
+    const config = HOST_ADAPTERS[host];
+    const targetDir = path.resolve(options.path || process.cwd());
+    const agentDir = path.join(targetDir, AGENT_FOLDER);
+    if (!config) {
+        console.error(chalk.red(`Error: Unsupported host "${host}". Choose: ${Object.keys(HOST_ADAPTERS).join(', ')}`));
+        process.exitCode = 1;
+        return;
+    }
+    const source = path.join(agentDir, ...config.source);
+    const destination = path.join(targetDir, ...config.destination);
+    if (!fs.existsSync(source)) {
+        console.error(chalk.red(`Error: Missing adapter source: ${source}. Run ${CLI_NAME} init first.`));
+        process.exitCode = 1;
+        return;
+    }
+    if (options.dryRun) {
+        console.log(`${chalk.blueBright('[Dry Run]')} Would copy ${source} → ${destination}`);
+        return;
+    }
+    if (fs.existsSync(destination) && !options.force) {
+        console.error(chalk.red(`Error: Destination already exists: ${destination}. Re-run with --force to replace it.`));
+        process.exitCode = 1;
+        return;
+    }
+    fs.mkdirSync(path.dirname(destination), { recursive: true });
+    fs.copyFileSync(source, destination);
+    console.log(chalk.green(`[OK] Linked ${host} adapter: ${destination}`));
+};
+
 // ============================================================================
 // CLI DEFINITION
 // ============================================================================
@@ -379,6 +464,21 @@ program
     .description('Check ea-kit installation status')
     .option('-p, --path <dir>', 'Path to the project directory', process.cwd())
     .action(statusCommand);
+
+program
+    .command('doctor')
+    .description('Diagnose ea-kit, host adapters, and platform readiness')
+    .option('-p, --path <dir>', 'Path to the project directory', process.cwd())
+    .option('--strict', 'Exit non-zero when required checks are missing', false)
+    .action(doctorCommand);
+
+program
+    .command('link-host <host>')
+    .description('Install a host adapter: codex, claude, cursor, or gemini')
+    .option('-f, --force', 'Replace an existing adapter file', false)
+    .option('-p, --path <dir>', 'Path to the project directory', process.cwd())
+    .option('--dry-run', 'Show the adapter file without copying it', false)
+    .action(linkHostCommand);
 
 // Parse arguments
 program.parse(process.argv);

@@ -1,0 +1,10 @@
+[
+  { "id": "mt5-stop-error", "prompt": "EA MT5 báo lỗi 10016 khi đặt Stop Loss cho XAUUSD", "expect": { "class": "bugfix", "mode": "implement", "persona": "mql5-expert", "verify_profile": "mt5-code" } },
+  { "id": "cbot-compile-error", "prompt": "cBot C# bị compile error sau khi đổi trailing stop", "expect": { "class": "bugfix", "mode": "implement", "persona": "cbot-expert", "verify_profile": "cbot-code" } },
+  { "id": "backtest-report", "prompt": "Phân tích Strategy Tester report này, PF cao nhưng DD cũng lớn", "expect": { "class": "analyze", "mode": "review", "persona": "ea-tester", "verify_profile": "analyze-only" } },
+  { "id": "new-strategy", "prompt": "Thiết kế chiến lược breakout mới cho XAUUSD", "expect": { "class": "strategy", "mode": "plan", "persona": "algo-strategist", "verify_profile": "docs-only" } },
+  { "id": "multi-file-feature", "prompt": "Thêm session filter cho EA MQL5 trên nhiều module", "expect": { "class": "feature", "mode": "plan", "persona": "algo-strategist", "verify_profile": "docs-only" } },
+  { "id": "full-cbot", "prompt": "Build full cTrader cBot end-to-end theo chiến lược đã chốt", "expect": { "class": "orchestrate", "mode": "plan", "persona": "algo-strategist", "verify_profile": "docs-only" } },
+  { "id": "readme-request", "prompt": "Viết README cho EA này", "expect": { "class": "docs", "mode": "implement", "persona": "documentation-writer", "verify_profile": "docs-only" } },
+  { "id": "kit-change", "prompt": "Sửa harness và rules của ea-kit", "expect": { "class": "meta", "mode": "implement", "persona": "kit-maintainer", "verify_profile": "kit-meta" } }
+]

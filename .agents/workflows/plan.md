@@ -30,8 +30,8 @@ $ARGUMENTS
 
 ### 1. Clarification
 
-- Hỏi đủ thông tin blocking (lần lượt nếu strategy).  
-- Chờ user trước khi ghi plan.
+- Mỗi lượt chỉ hỏi một thông tin P0 blocking nếu strategy; dùng câu trả lời để chọn câu kế tiếp.
+- Chờ user trước khi ghi plan; không gửi checklist nhiều câu hỏi độc lập.
 
 ### 2. Version docs
 

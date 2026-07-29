@@ -23,6 +23,8 @@ Classify before acting:
 | `docs` | implement | Document only what the user requested. |
 | `meta` | implement | Kit maintenance; do not apply trading discovery rituals. |
 
+For a `strategy`, large `feature`, or `orchestrate` gate, ask **one P0 blocking question per turn**. Start with the unanswered decision that removes the largest implementation branch, wait for the reply, then reassess the next question from that answer. A multiple-choice format is allowed for that one decision; never bundle independent questions such as symbol, timeframe, risk, and market regime in the same message. Stop as soon as the remaining details are non-blocking or have a clearly disclosed default.
+
 Use one conversation and switch persona/mode deliberately. A cross-persona boundary needs an approved PLAN with the same information or a `HANDOFF-*.md` file. Create `SESSION.md` only for orchestration, multi-day work, or two or more handoffs.
 
 ## Portable capabilities

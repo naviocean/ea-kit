@@ -275,6 +275,7 @@ if (!fs.existsSync(coreRulesPath)) {
     const coreRules = fs.readFileSync(coreRulesPath, 'utf-8');
     const requiredSnippets = [
         { re: /Request routing|Classify before acting/, label: 'request routing' },
+        { re: /one P0 blocking question per turn/i, label: 'sequential Socratic gate' },
         { re: /rwcommon/i, label: 'rwcommon policy' },
         { re: /optional/i, label: 'flexible/optional rwcommon (not always-only)' },
         { re: /HANDOFF/, label: 'HANDOFF' },
@@ -306,6 +307,12 @@ if (!fs.existsSync(geminiAdapterPath)) {
 for (const rel of ['AGENTS.md', 'CLAUDE.md', '.agents/adapters/README.md']) {
     if (fs.existsSync(path.join(ROOT, rel))) ok(`present portable adapter ${rel}`);
     else fail(`missing portable adapter ${rel}`);
+}
+
+if (fs.existsSync(path.join(AGENTS_DIR, 'fixtures', 'harness', 'routing.json'))) {
+    ok('present harness routing fixtures');
+} else {
+    fail('missing .agents/fixtures/harness/routing.json');
 }
 
 const harnessFiles = [

@@ -24,12 +24,7 @@ allowed-tools: Read, Glob, Grep
 
 1. **Decomposition** nếu quá lớn.  
 2. **STOP** code production.  
-3. **ASK** blocking — trading-first, không “Users = end users web”:
-   - Mục tiêu / edge  
-   - Symbol + timeframe  
-   - Risk / DD / prop hay personal  
-   - Scope must-have  
-   > Hỏi lần lượt hoặc multiple-choice.  
+3. **ASK** một câu P0 blocking duy nhất, trading-first, không “Users = end users web”. Chọn câu có information gain cao nhất (thường là mục tiêu/edge nếu chưa rõ), chờ trả lời rồi mới chọn câu tiếp theo về symbol/TF, risk/DD/prop, hoặc scope. Multiple-choice chỉ áp dụng cho **một** quyết định đó; không gộp các quyết định độc lập vào cùng message.
 4. **PROPOSE** 2–3 hướng + trade-off + recommend.  
 5. **WAIT** user.
 
@@ -59,6 +54,7 @@ allowed-tools: Read, Glob, Grep
 | Context first | greenfield / feature / refactor / debug |
 | Minimum viable questions | Chỉ P0 blocking |
 | Không đoán | Hỏi kèm default nếu bỏ qua |
+| One decision per turn | Hỏi một câu, chờ đáp án, rồi mới suy luận câu kế |
 
 Format gợi ý:
 

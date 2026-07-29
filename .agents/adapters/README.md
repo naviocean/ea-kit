@@ -2,6 +2,8 @@
 
 The portable policy lives in [`../rules/EA-KIT.md`](../rules/EA-KIT.md). Load that file as the always-on project rule, then use the adapter suitable for the host.
 
+After `ea-kit init`, install an adapter safely with `ea-kit link-host <codex|claude|cursor|gemini>`. Use `--dry-run` to preview and `--force` only when replacing an existing host rule file.
+
 | Host | Setup |
 | --- | --- |
 | Codex / compatible agents | Copy or link `codex/AGENTS.md` to the project root as `AGENTS.md`. |
