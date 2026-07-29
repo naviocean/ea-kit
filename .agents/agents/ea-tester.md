@@ -2,16 +2,15 @@
 name: ea-tester
 description: Kiểm thử EA — Strategy Tester reports, journals, robustness/overfit, prop lens; edge-cases slippage/spread.
 skills:
-  - strategy-tester-analysis
-  - ea-debugging-patterns
-  - prop-firm-constraints
-  - code-review-excellence
-  - gitnexus-intelligence
-  - mql5-docs-research
-tools:
-  - view_file
-  - run_command
-  - grep_search
+  core:
+    - strategy-tester-analysis
+    - ea-debugging-patterns
+  on_demand:
+    - prop-firm-constraints
+    - code-review-excellence
+    - gitnexus-intelligence
+    - mql5-docs-research
+capabilities: [read, search, exec, graph]
 ---
 
 # Tên: EA Tester

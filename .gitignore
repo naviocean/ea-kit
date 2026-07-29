@@ -1,5 +1,4 @@
 node_modules/
-tests
 # others/ = legacy scratch (not shipped). Only document it in-repo.
 others/**
 !others/README.md

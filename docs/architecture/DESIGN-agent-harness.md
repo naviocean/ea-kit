@@ -19,7 +19,7 @@ ea-kit today is strong as a **policy + knowledge pack** (RWCommon, personas, dom
 1. **Multi-agent is cosplay** — personas and `/orchestrate` claim “invoke agents” without a real handoff runtime or enforceable mode switch.
 2. **Gate stack is overloaded** — Socratic Gate on every request + brainstorm “design must be committed” + plan + orchestrate checkpoints conflict and create friction (or learned non-compliance).
 3. **“Lazy skills” is aspirational** — agents list 5–8 skills as mandatory; large vendor trees (`mql-developer`, `ctrader-mcp-servers`) blow context.
-4. **Host-coupled** — `GEMINI.md`, `$ARGUMENTS`, tool names (`view_file`, `mcp_gitnexus_*`) assume one runtime; Claude/Cursor/Grok get undefined behavior.
+4. **Host-coupled (resolved)** — portable core rules now use capabilities; Gemini, Codex, Claude, and Cursor use thin adapters.
 5. **Iron Law has no teeth** — “must compile/test before claiming done” with no MT5/cBot verify path in the kit.
 6. **MCP surface is incomplete** — only GitNexus in `mcp_config.json`; cTrader skill exists but is not wired as kit MCP.
 
@@ -54,7 +54,7 @@ P0/P1 fixed consistency, naming, graceful GitNexus, and static `npm test`. They 
 ## 4. Current architecture (as-is)
 
 ```text
-User → (host) → always-on GEMINI rules
+User → (host) → portable EA-KIT rules (via host adapter)
               → optional /workflow markdown ($ARGUMENTS)
               → “apply persona” in same context
               → MUST read long skill lists
@@ -261,10 +261,11 @@ skills:
 
 | Host | Artifact |
 | ---- | -------- |
-| Antigravity / Gemini | `.agents/rules/GEMINI.md` (evolved) |
-| Claude Code | `AGENTS.md` or `.claude/` rules fragment linking `.agents` |
-| Cursor | `.cursor/rules/ea-kit.mdc` (or project rule) pointing at harness |
-| Generic | `README` + “paste GEMINI always-on” |
+| Gemini / Antigravity | `.agents/rules/GEMINI.md` compatibility adapter → `EA-KIT.md` |
+| Codex | root `AGENTS.md` / `.agents/adapters/codex/AGENTS.md` → `EA-KIT.md` |
+| Claude Code | root `CLAUDE.md` / `.agents/adapters/claude/CLAUDE.md` → `EA-KIT.md` |
+| Cursor | `.agents/adapters/cursor/ea-kit.mdc` → `EA-KIT.md` |
+| Generic | `.agents/rules/EA-KIT.md` directly |
 
 CLI: `ea-kit link-host <name>` (v0.3) writes/updates adapter stubs.
 
@@ -417,7 +418,7 @@ Workflow markdown: keep `$ARGUMENTS` for Antigravity; adapters document equivale
 
 | Path | Change type |
 | ---- | ----------- |
-| `.agents/rules/GEMINI.md` | Classifier, modes, skill tiers, tool capabilities, platform verify profiles |
+| `.agents/rules/EA-KIT.md` | Portable classifier, modes, skill tiers, capabilities, platform verify profiles |
 | `.agents/skills/gitnexus-intelligence/` | Keep graceful (done); align wording with modes |
 | `.agents/skills/brainstorming/SKILL.md` | Scope to `strategy`/`feature`; remove web error categories; drop “committed” hard requirement → “saved under docs/” |
 | `.agents/agents/*.md` | `skills.core` / `on_demand`; portable tools note |
@@ -497,7 +498,7 @@ Workflow markdown: keep `$ARGUMENTS` for Antigravity; adapters document equivale
 
 | # | Câu hỏi | Quyết định |
 | - | ------- | ---------- |
-| 1 | Ngôn ngữ rules always-on | **Tiếng Việt** (dễ đọc team). Tên file, identifier, skill id, path giữ English. Skill vendor EN giữ nguyên; tóm tắt/trigger tiếng Việt ở GEMINI khi cần. |
+| 1 | Ngôn ngữ rules always-on | **Tiếng Việt** (dễ đọc team). Tên file, identifier, skill id, path giữ English. Skill vendor EN giữ nguyên; tóm tắt/trigger tiếng Việt ở portable core khi cần. |
 | 2 | RWCommon | **Flexible — không always.** Xem **D10** (detect lib/flag → required; greenfield → optional + note). |
 | 3 | `SESSION.md` | **Có điều kiện — không always.** Xem **D11** (orchestrate, multi-day, multi-handoff). |
 | 4 | Subagents | **Modes + HANDOFF là core.** Spawn host chỉ optional v0.3+. Xem **D12**. |

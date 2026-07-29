@@ -32,13 +32,13 @@ After install, the project gets `.agents/ea-kit-version.json` (name + version + 
 ### Option B — Manual copy
 
 1. Copy the entire `.agents` folder into the root of your EA/cBot project.
-2. Append `.agents/rules/GEMINI.md` to the AI system prompt / always-on rules.
-3. Enable MCP from `.agents/mcp_config.json` when using GitNexus (optional but recommended for large codebases).
+2. Load `.agents/rules/EA-KIT.md` as the AI project rule / always-on instruction. For automatic root-rule discovery, copy `.agents/adapters/codex/AGENTS.md` to `AGENTS.md` (Codex) or `.agents/adapters/claude/CLAUDE.md` to `CLAUDE.md` (Claude Code); see `.agents/adapters/README.md` for Cursor, Gemini, and generic hosts.
+3. Optionally enable the **pinned** GitNexus MCP configuration from `.agents/mcp_config.json` for large codebases.
 4. Drive work with workflows: `/brainstorm`, `/plan`, `/orchestrate`, `/test`.
 
 ## Agent harness (control plane)
 
-Always-on rules: **`.agents/rules/GEMINI.md`** (tiếng Việt) — classify request → gate depth → mode → persona → verify.
+Portable core rules: **`.agents/rules/EA-KIT.md`** (tiếng Việt) — classify request → gate depth → mode → persona → verify. `GEMINI.md` is a compatibility adapter only.
 
 | Doc | Purpose |
 | --- | ------- |
@@ -85,7 +85,8 @@ cTrader uses `cbot-clean-code` / migration skills — not MQL5/RWCommon.
   agents/       # Personas
   skills/       # Lazy-loaded expertise
   workflows/    # /brainstorm, /plan, /orchestrate, /test
-  rules/        # Global always-on rules (GEMINI.md)
+  rules/        # Portable core rules + compatibility adapters
+  adapters/     # Host setup snippets (Codex, Claude, Cursor, Gemini)
   mcp_config.json
 bin/            # CLI (init / update / status)
 scripts/        # Kit self-test (npm test)

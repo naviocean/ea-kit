@@ -22,7 +22,7 @@ Run from the project root. This parses all source files, builds the knowledge gr
 | `--force`      | Force full re-index even if up to date                           |
 | `--embeddings` | Enable embedding generation for semantic search (off by default) |
 
-**When to run:** First time in a project, after major code changes, or when `gitnexus://repo/{name}/context` reports the index is stale. For Antigravity/Gemini (RedWave Labs) agents, `analyze` can be run manually via the `run_command` tool, or automatically as part of your git hooks/CI workflows.
+**When to run:** First time in a project, after major code changes, or when `gitnexus://repo/{name}/context` reports the index is stale. Any host with the `exec` capability can run `analyze` manually or through its CI/hooks.
 
 ### status — Check index freshness
 

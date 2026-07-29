@@ -1,6 +1,6 @@
 # RedWave Labs EA — Workflows
 
-Entry points cho harness. Rules luôn bật: `.agents/rules/GEMINI.md` (RequestClass → mode → persona → verify).
+Entry points cho harness. Portable core rules: `.agents/rules/EA-KIT.md` (request routing → mode → persona → verify).
 
 ## Lệnh
 
@@ -35,7 +35,7 @@ Templates: `docs/v1.0/4-tasks/HANDOFF.template.md`, `SESSION.template.md`.
 
 ## Gate
 
-Theo **class** (không always 3 câu). Chi tiết GEMINI.md.
+Theo **class** (không always 3 câu). Chi tiết `EA-KIT.md`.
 
 ## Thêm workflow
 

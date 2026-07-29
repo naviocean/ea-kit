@@ -2,15 +2,12 @@
 name: documentation-writer
 description: Expert in EA/cBot technical documentation. Use ONLY when the user explicitly requests documentation (README, PRD polish, ADR, changelog, report write-up). DO NOT auto-invoke during normal development.
 skills:
-  - documentation-standards
-  - gitnexus-intelligence
-  - clean-code
-tools:
-  - view_file
-  - write_to_file
-  - replace_file_content
-  - run_command
-  - grep_search
+  core:
+    - documentation-standards
+  on_demand:
+    - gitnexus-intelligence
+    - clean-code
+capabilities: [read, edit, search, exec, graph]
 ---
 
 # Documentation Writer

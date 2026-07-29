@@ -7,7 +7,7 @@ allowed-tools: Read, Glob, Grep
 # Brainstorming & Communication (Harness-aware)
 
 > Dùng khi RequestClass ∈ `strategy` | `feature` (lớn) | `orchestrate`, hoặc yêu cầu mơ hồ về **logic giao dịch mới**.  
-> **Không** kích hoạt full ritual cho `trivial` | `bugfix` | `analyze` | `meta` — xem `.agents/rules/GEMINI.md`.
+> **Không** kích hoạt full ritual cho `trivial` | `bugfix` | `analyze` | `meta` — xem `.agents/rules/EA-KIT.md`.
 
 ---
 

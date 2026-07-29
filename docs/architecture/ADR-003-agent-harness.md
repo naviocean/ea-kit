@@ -11,7 +11,7 @@ ea-kit ships personas, skills, workflows, and always-on rules. After P0/P1 clean
 - Always-on Socratic Gate before almost any work  
 - “Multi-agent” language without durable handoffs  
 - Large mandatory skill lists  
-- Host-specific tool names and `GEMINI.md` only  
+- Host-specific tool names and a single-host rules entrypoint
 - “Evidence before claims” without a real MT5/cBot verify path  
 
 We need a harness that is portable, low-friction for small tasks, strict for new strategies, and auditable across roles.
@@ -23,7 +23,7 @@ We need a harness that is portable, low-friction for small tasks, strict for new
 3. **Skill tiers** (core / on-demand / reference) replace “load every skill in frontmatter.”  
 4. **Platform-specific verify profiles** back the Iron Law; manual verify must be labeled, not implied as compile success.  
 5. Deliver in **three phases** (v0.1 control loop → v0.2 skills/verify/eval → v0.3 host/doctor/MCP examples).  
-6. **Always-on rules language: Vietnamese** (paths/ids English; vendor skills may stay EN).  
+6. **Portable core rules language: Vietnamese** (paths/ids English; vendor skills may stay EN), loaded through thin host adapters.
 7. **RWCommon is flexible:** required when project already uses the lib (or flag); optional on greenfield with explicit note — not globally mandatory.  
 8. **`SESSION.md` only when needed:** `/orchestrate`, multi-day resume, or multi-handoff — not every chat.
 
@@ -59,5 +59,5 @@ We need a harness that is portable, low-friction for small tasks, strict for new
 ## References
 
 - `docs/architecture/DESIGN-agent-harness.md`  
-- `.agents/rules/GEMINI.md`  
+- `.agents/rules/EA-KIT.md`
 - `.agents/workflows/orchestrate.md`  

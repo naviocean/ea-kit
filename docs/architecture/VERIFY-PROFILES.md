@@ -2,7 +2,7 @@
 
 Agent **không** được claim “done / fixed / compiled OK” nếu thiếu evidence theo profile.
 
-Tham chiếu harness: `DESIGN-agent-harness.md` · rules: `.agents/rules/GEMINI.md`
+Tham chiếu harness: `DESIGN-agent-harness.md` · portable rules: `.agents/rules/EA-KIT.md`
 
 ---
 

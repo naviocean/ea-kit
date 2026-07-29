@@ -19,8 +19,8 @@ const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'
 
 const CLI_NAME = 'ea-kit';
 const AGENT_FOLDER = '.agents';
-/** Written into project after install so `status` can report kit identity */
-const VERSION_FILE = path.join(AGENT_FOLDER, 'ea-kit-version.json');
+/** Written into .agents after install so `status` can report kit identity */
+const VERSION_FILE = 'ea-kit-version.json';
 
 // ============================================================================
 // UTILITIES
@@ -83,10 +83,10 @@ const copyAgentFolder = (sourceDir, destDir) => {
 
 /**
  * Write install metadata so projects know which ea-kit version is installed
- * @param {string} targetDir - Project root
+ * @param {string} agentDir - .agents directory
  */
-const writeVersionManifest = (targetDir) => {
-    const manifestPath = path.join(targetDir, VERSION_FILE);
+const writeVersionManifest = (agentDir) => {
+    const manifestPath = path.join(agentDir, VERSION_FILE);
     const manifest = {
         name: CLI_NAME,
         package: pkg.name,
@@ -98,11 +98,11 @@ const writeVersionManifest = (targetDir) => {
 
 /**
  * Read install metadata if present
- * @param {string} targetDir
+ * @param {string} agentDir
  * @returns {object|null}
  */
-const readVersionManifest = (targetDir) => {
-    const manifestPath = path.join(targetDir, VERSION_FILE);
+const readVersionManifest = (agentDir) => {
+    const manifestPath = path.join(agentDir, VERSION_FILE);
     if (!fs.existsSync(manifestPath)) return null;
     try {
         return JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
@@ -112,7 +112,8 @@ const readVersionManifest = (targetDir) => {
 };
 
 /**
- * Backup existing .agents before overwrite (update/init replace)
+ * Move existing .agents into a sibling backup directory. Moving, rather than
+ * copying, lets the following install be an actual replacement with no stale files.
  * @param {string} agentDir
  * @param {boolean} quiet
  * @returns {string|null} backup path
@@ -122,9 +123,26 @@ const backupAgentsFolder = (agentDir, quiet = false) => {
 
     const stamp = new Date().toISOString().replace(/[:.]/g, '-');
     const backupDir = `${agentDir}.bak-${stamp}`;
-    fs.cpSync(agentDir, backupDir, { recursive: true });
+    fs.renameSync(agentDir, backupDir);
     log(chalk.gray(`Backup: ${backupDir}`), quiet);
     return backupDir;
+};
+
+const assertInstallTarget = (targetDir, agentDir) => {
+    if (!fs.existsSync(targetDir) || !fs.statSync(targetDir).isDirectory()) {
+        throw new Error(`Target path must be an existing directory: ${targetDir}`);
+    }
+    if (fs.existsSync(agentDir) && fs.lstatSync(agentDir).isSymbolicLink()) {
+        throw new Error(`Refusing to replace symbolic link: ${agentDir}`);
+    }
+};
+
+const createStagedAgentsFolder = (targetDir, sourcePath) => {
+    const stageRoot = fs.mkdtempSync(path.join(targetDir, '.ea-kit-stage-'));
+    const stagedAgents = path.join(stageRoot, AGENT_FOLDER);
+    copyAgentFolder(sourcePath, stagedAgents);
+    writeVersionManifest(stagedAgents);
+    return { stageRoot, stagedAgents };
 };
 
 // ============================================================================
@@ -155,23 +173,9 @@ const initCommand = async (options) => {
         if (exists) {
             console.log(`  3. ${chalk.yellow(`Backup existing ${AGENT_FOLDER} then overwrite`)}`);
         }
-        console.log(`  4. Write ${chalk.cyan(VERSION_FILE)} (v${pkg.version})`);
+        console.log(`  4. Write ${chalk.cyan(path.join(AGENT_FOLDER, VERSION_FILE))} (v${pkg.version})`);
         console.log(chalk.gray('────────────────────────────────────────\n'));
         return;
-    }
-
-    // Check if .agents already exists
-    if (exists) {
-        if (!options.force) {
-            log(chalk.yellow(`Warning: Folder ${AGENT_FOLDER} already exists at: ${agentDir}`), quiet);
-            const shouldOverwrite = await confirm('Do you want to backup and overwrite it?');
-
-            if (!shouldOverwrite) {
-                log(chalk.gray('Operation cancelled.'), quiet);
-                process.exit(0);
-            }
-        }
-        log(chalk.gray(`Backing up and overwriting ${AGENT_FOLDER}...`), quiet);
     }
 
     const spinner = quiet ? null : ora({
@@ -180,16 +184,40 @@ const initCommand = async (options) => {
     }).start();
 
     try {
-        if (exists) {
-            if (spinner) spinner.text = 'Backing up existing .agents...';
-            backupAgentsFolder(agentDir, true);
+        assertInstallTarget(targetDir, agentDir);
+
+        if (exists && !options.force) {
+            if (quiet || !process.stdin.isTTY) {
+                throw new Error(`Refusing to overwrite ${AGENT_FOLDER} non-interactively. Re-run with --force.`);
+            }
+            log(chalk.yellow(`Warning: Folder ${AGENT_FOLDER} already exists at: ${agentDir}`), quiet);
+            const shouldOverwrite = await confirm('Do you want to backup and overwrite it?');
+            if (!shouldOverwrite) {
+                log(chalk.gray('Operation cancelled.'), quiet);
+                return;
+            }
         }
 
-        if (spinner) spinner.text = 'Copying files...';
-        copyAgentFolder(sourcePath, agentDir);
+        if (exists) log(chalk.gray(`Backing up and replacing ${AGENT_FOLDER}...`), quiet);
 
-        if (spinner) spinner.text = 'Writing ea-kit version manifest...';
-        writeVersionManifest(targetDir);
+        if (spinner) spinner.text = 'Staging files...';
+        const { stageRoot, stagedAgents } = createStagedAgentsFolder(targetDir, sourcePath);
+        let backupDir = null;
+        try {
+            if (exists) {
+                if (spinner) spinner.text = 'Backing up existing .agents...';
+                backupDir = backupAgentsFolder(agentDir, true);
+            }
+            if (spinner) spinner.text = 'Installing files...';
+            fs.renameSync(stagedAgents, agentDir);
+        } catch (error) {
+            if (!fs.existsSync(agentDir) && backupDir && fs.existsSync(backupDir)) {
+                fs.renameSync(backupDir, agentDir);
+            }
+            throw error;
+        } finally {
+            fs.rmSync(stageRoot, { recursive: true, force: true });
+        }
 
         if (spinner) {
             spinner.succeed(chalk.green(`ea-kit v${pkg.version} installed successfully!`));
@@ -237,7 +265,16 @@ const updateCommand = async (options) => {
         process.exit(1);
     }
 
-    if (!options.force && !quiet) {
+    if (options.dryRun) {
+        await initCommand({ ...options, force: true, quiet });
+        return;
+    }
+
+    if (!options.force) {
+        if (quiet || !process.stdin.isTTY) {
+            console.error(chalk.red(`Error: Refusing to overwrite ${AGENT_FOLDER} non-interactively. Re-run with --force.`));
+            process.exit(1);
+        }
         log(chalk.yellow(`Warning: Update will backup then overwrite the entire ${AGENT_FOLDER} folder`), quiet);
         const shouldUpdate = await confirm('Are you sure you want to continue?');
 
@@ -257,12 +294,12 @@ const updateCommand = async (options) => {
 const statusCommand = (options) => {
     const targetDir = path.resolve(options.path || process.cwd());
     const agentDir = path.join(targetDir, AGENT_FOLDER);
-    const manifest = readVersionManifest(targetDir);
+    const manifest = readVersionManifest(agentDir);
 
     console.log(chalk.blueBright(`\n${CLI_NAME} status\n`));
 
     if (fs.existsSync(agentDir)) {
-        const stats = fs.statSync(agentDir);
+        const stats = fs.lstatSync(agentDir);
 
         // Count files recursively
         let filesCount = 0;
@@ -270,7 +307,8 @@ const statusCommand = (options) => {
             const items = fs.readdirSync(dir);
             for (const item of items) {
                 const fullPath = path.join(dir, item);
-                if (fs.statSync(fullPath).isDirectory()) {
+                const itemStats = fs.lstatSync(fullPath);
+                if (itemStats.isDirectory()) {
                     countFiles(fullPath);
                 } else {
                     filesCount++;

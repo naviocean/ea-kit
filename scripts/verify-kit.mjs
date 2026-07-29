@@ -69,16 +69,23 @@ function parseFrontmatter(content) {
     const raw = content.slice(3, end).trim();
     const body = content.slice(end + 4);
     const data = {};
-    // skills: as YAML list or inline
+    // skills: legacy flat list, inline list, or tiered core/on_demand lists
+    const tieredSkills = [...raw.matchAll(/^  (?:core|on_demand):\s*\n((?:    -\s+.+\n?)*)/gm)]
+        .flatMap((match) => match[1]
+            .split('\n')
+            .map((line) => line.replace(/^\s*-\s*/, '').trim())
+            .filter(Boolean));
     const skillsBlock = raw.match(/^skills:\s*\n((?:[ \t]+-\s+.+\n?)*)/m);
-    if (skillsBlock) {
+    if (tieredSkills.length) {
+        data.skills = tieredSkills;
+    } else if (skillsBlock) {
         data.skills = skillsBlock[1]
             .split('\n')
             .map((l) => l.replace(/^\s*-\s*/, '').trim())
             .filter(Boolean);
     } else {
         const skillsInline = raw.match(/^skills:\s*(.+)$/m);
-        if (skillsInline) {
+        if (!data.skills && skillsInline) {
             data.skills = skillsInline[1].split(',').map((s) => s.trim()).filter(Boolean);
         }
     }
@@ -261,30 +268,44 @@ if (fs.existsSync(path.join(ROOT, 'others'))) {
 
 // --- Harness v0.1 contracts ---
 console.log('\nHarness v0.1');
-const geminiPath = path.join(AGENTS_DIR, 'rules', 'GEMINI.md');
-if (!fs.existsSync(geminiPath)) {
-    fail('missing .agents/rules/GEMINI.md');
+const coreRulesPath = path.join(AGENTS_DIR, 'rules', 'EA-KIT.md');
+if (!fs.existsSync(coreRulesPath)) {
+    fail('missing .agents/rules/EA-KIT.md');
 } else {
-    const gemini = fs.readFileSync(geminiPath, 'utf-8');
+    const coreRules = fs.readFileSync(coreRulesPath, 'utf-8');
     const requiredSnippets = [
-        { re: /RequestClass|class=`trivial`|class=\`trivial\`|`trivial`/, label: 'RequestClass / trivial class' },
+        { re: /Request routing|Classify before acting/, label: 'request routing' },
         { re: /rwcommon/i, label: 'rwcommon policy' },
         { re: /optional/i, label: 'flexible/optional rwcommon (not always-only)' },
         { re: /HANDOFF/, label: 'HANDOFF' },
         { re: /SESSION/, label: 'SESSION conditional' },
         { re: /VERIFY-PROFILES|verify_profile|mt5-code/, label: 'verify profiles' },
-        { re: /mode=`plan`|mode=\`plan\`|mode.*plan/i, label: 'mode machine' },
+        { re: /Mode|plan.*implement.*review/i, label: 'mode machine' },
     ];
     for (const { re, label } of requiredSnippets) {
-        if (re.test(gemini)) ok(`GEMINI.md: ${label}`);
-        else fail(`GEMINI.md missing harness piece: ${label}`);
+        if (re.test(coreRules)) ok(`EA-KIT.md: ${label}`);
+        else fail(`EA-KIT.md missing harness piece: ${label}`);
     }
     // Must NOT require 3 questions before ANY tool for all requests
-    if (/Every user request must pass through the Socratic Gate before ANY tool/i.test(gemini)) {
-        fail('GEMINI.md still has old always-Socratic-before-ANY-tool rule');
+    if (/Every user request must pass through the Socratic Gate before ANY tool/i.test(coreRules)) {
+        fail('EA-KIT.md still has old always-Socratic-before-ANY-tool rule');
     } else {
-        ok('GEMINI.md: no always-Socratic-before-ANY-tool');
+        ok('EA-KIT.md: no always-Socratic-before-ANY-tool');
     }
+}
+
+const geminiAdapterPath = path.join(AGENTS_DIR, 'rules', 'GEMINI.md');
+if (!fs.existsSync(geminiAdapterPath)) {
+    fail('missing Gemini compatibility adapter');
+} else if (/EA-KIT\.md/.test(fs.readFileSync(geminiAdapterPath, 'utf-8'))) {
+    ok('Gemini adapter delegates to portable core');
+} else {
+    fail('Gemini adapter does not delegate to portable core');
+}
+
+for (const rel of ['AGENTS.md', 'CLAUDE.md', '.agents/adapters/README.md']) {
+    if (fs.existsSync(path.join(ROOT, rel))) ok(`present portable adapter ${rel}`);
+    else fail(`missing portable adapter ${rel}`);
 }
 
 const harnessFiles = [

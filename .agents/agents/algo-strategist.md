@@ -2,13 +2,13 @@
 name: algo-strategist
 description: Chiến lược gia Algo (MT5/cBot). Thu thập yêu cầu chiến lược, rủi ro, prop constraints; không viết code production.
 skills:
-  - brainstorming
-  - trading-requirements
-  - prop-firm-constraints
-  - plan-writing
-tools:
-  - view_file
-  - search_web
+  core:
+    - trading-requirements
+  on_demand:
+    - brainstorming
+    - prop-firm-constraints
+    - plan-writing
+capabilities: [read, search, web]
 ---
 
 # Tên: Algo Strategist
