@@ -1,113 +1,97 @@
 ---
-description: Điều phối multi-persona (modes + HANDOFF) cho vòng đời EA/cBot đầy đủ.
+description: Vòng đời EA/cBot khép kín: discovery → PRD → plan/tasks → implement → code audit.
 ---
 
-# /orchestrate — Orchestration EA / cBot
+# /orchestrate — Delivery lifecycle EA / cBot
 
-**Harness:** class=`orchestrate` · mode bắt đầu=`plan` · cần **SESSION.md**
-
-Nhiệm vụ:
-
-$ARGUMENTS
-
----
-
-## Nguyên tắc harness (bắt buộc)
-
-1. **Không** giả spawn nhiều process. Dùng **đổi persona + mode** + file **HANDOFF**.  
-2. **Tối thiểu 2 persona khác nhau** trên suốt lifecycle (ví dụ strategist + expert), thể hiện bằng HANDOFF/PLAN — không đếm “agent_count” ảo.  
-3. `documentation-writer` chỉ khi user **xin docs**.  
-4. Tạo/cập nhật `docs/{version}/4-tasks/SESSION.md` (template `SESSION.template.md`). Đọc version từ `docs/PROJECT_ROOT.md`.
-
-### Platform
-
-| Tín hiệu | Platform | Persona dev |
-| -------- | -------- | ----------- |
-| `.mq5`, MT5, RWCommon, Strategy Tester | MT5 | `mql5-expert` |
-| cBot, cAlgo, cTrader | cTrader | `cbot-expert` |
-| Migrate MT5→cBot | dual | migration qua `cbot-expert` (+ làm rõ source nếu cần) |
-| Chưa rõ | **HỎI** trước Phase 2 | — |
-
-Xác định `rwcommon=` theo GEMINI D10 (flexible).
-
-### Ma trận persona
-
-| Task | Persona |
-| ---- | ------- |
-| New EA MT5 | algo-strategist → mql5-expert → ea-tester |
-| New cBot | algo-strategist → cbot-expert (+ ea-tester nếu có log/report) |
-| Indicator MT5 | algo-strategist → mql5-expert |
-| Bug MT5 | ea-tester → mql5-expert (HANDOFF) |
-| Bug cBot | cbot-expert (+ ea-tester optional) |
-
----
-
-## PHASE 1 — PLAN (mode=`plan`)
-
-| Bước | Persona | Việc |
-| ---- | ------- | ---- |
-| 1 | `algo-strategist` | Gate strategy; tạo `docs/{version}/3-plans/PLAN-*.md` |
-| 2 | — | Cập nhật SESSION (mode=plan, plan path, rwcommon) |
-
-> Chỉ persona planning trong phase này. **Không code.**
-
-### Checkpoint
+**Harness:** class=`orchestrate` · mode bắt đầu=`plan` · cần `SESSION.md`
 
 ```
-✅ Plan đã lưu. Bạn approve để sang implement? (Y/N)
+DISCOVERY → PRD approved → PLAN + TASKS approved → IMPLEMENT → CODE AUDIT → DONE
 ```
 
-**Không** vào Phase 2 nếu chưa Y tường minh.
+## Nguyên tắc
 
----
+1. Một conversation; đổi persona/mode có chủ đích. Mỗi ranh giới strategist → dev hoặc dev → reviewer cần `HANDOFF-*.md` hoặc PLAN có đủ cùng thông tin.
+2. Dùng `docs/{version}/4-tasks/SESSION.md`; đọc `{version}` từ `docs/PROJECT_ROOT.md`.
+3. Với strategy/orchestrate, hỏi Socratic **một câu P0 mỗi lượt**, chờ đáp án rồi mới hỏi tiếp.
+4. Không có approval thì không chuyển từ Discovery/Design sang Implement. Không có audit decision `approve` thì không `done`.
+5. Xác định `rwcommon=` theo `rules/EA-KIT.md`: required | optional | forbidden.
 
-## PHASE 2 — IMPLEMENT (mode=`implement`)
+| Platform | Developer | Review profile |
+| -------- | --------- | -------------- |
+| MT5 / `.mq5` / RWCommon | `mql5-expert` | `mt5-code` |
+| cBot / cAlgo / cTrader | `cbot-expert` | `cbot-code` |
+| Dual / migration | `cbot-expert` + relevant dev | both as applicable |
 
-1. Viết **HANDOFF** strategist → dev (template `HANDOFF.template.md`) nếu PLAN chưa đủ field handoff.  
-2. Persona dev (`mql5-expert` / `cbot-expert`) implement theo PLAN/HANDOFF.  
-3. Cập nhật SESSION (`mode=implement`, `last_handoff`).  
-4. Skill: tối đa 2 core + on-demand; không bulk-read references.
+## Phase 1 — DISCOVERY
 
----
+**Persona:** `algo-strategist` · **Mode:** `plan`
 
-## PHASE 3 — REVIEW (mode=`review`)
+1. Làm rõ edge, regime, symbol/TF, risk, prop constraints và no-trade conditions theo Socratic tuần tự.
+2. Đưa options, trade-offs và recommendation.
+3. Ghi `docs/{version}/1-prds/PRD-{slug}.md` từ `PRD.template.md` với rules testable và acceptance criteria.
+4. Cập nhật SESSION với PRD path và trạng thái `discovery-complete`.
 
-1. HANDOFF dev → `ea-tester` (hoặc tester đọc trực tiếp nếu cùng session đã có HANDOFF).  
-2. Verify profile: `mt5-code` / `cbot-code` — xem `docs/architecture/VERIFY-PROFILES.md`.  
-3. Evidence: compile/build **hoặc** `VERIFY=MANUAL`.  
-4. SESSION → `mode=done` khi DoD đạt.
+### Checkpoint A
 
----
+```
+✅ PRD đã lưu: docs/{version}/1-prds/PRD-{slug}.md
+Bạn chấp thuận ý tưởng/rules này để lập kế hoạch triển khai? (Y/N)
+```
 
-## Context khi đổi persona
+## Phase 2 — DESIGN
 
-Luôn mang theo:
+**Persona:** `algo-strategist` · **Mode:** `plan`
 
-1. User request gốc  
-2. Path PLAN + HANDOFF  
-3. Platform + `rwcommon`  
-4. Constraints risk/symbol/TF  
+1. Ghi `docs/{version}/3-plans/PLAN-{slug}.md`: module/files, RWCommon decision, dependencies, verify profile, DoD.
+2. Tạo một hoặc nhiều `docs/{version}/4-tasks/TASK-{slug}.md` từ `TASK.template.md`; mỗi task có owner, scope, acceptance criteria và HANDOFF ref.
+3. Ghi HANDOFF strategist → developer với PRD, PLAN, TASK paths, platform, risk constraints và user approval.
+4. Cập nhật SESSION với plan/task/handoff path và mode `plan`.
 
----
+### Checkpoint B
+
+```
+✅ PLAN và TASKS đã lưu.
+Bạn approve để implement theo artifacts này? (Y/N)
+```
+
+## Phase 3 — IMPLEMENT
+
+**Persona:** `mql5-expert` hoặc `cbot-expert` · **Mode:** `implement`
+
+1. Implement đúng PRD/PLAN/TASK/HANDOFF; không thêm strategy rule chưa duyệt.
+2. Cập nhật từng TASK status và SESSION mode `implement`.
+3. Thu evidence theo profile: compile/build hoặc `VERIFY=MANUAL`; manual impact search hoặc graph.
+4. Khi ready, tạo HANDOFF developer → `ea-tester` gồm diff/files, evidence, risks và audit scope.
+
+## Phase 4 — CODE AUDIT & RELEASE GATE
+
+**Persona:** `ea-tester` · **Mode:** `review`
+
+1. Review PRD/PLAN/TASK đối chiếu với diff: correctness, risk, broker/API constraints, error handling, test coverage và maintainability.
+2. Kiểm tra platform profile (`mt5-code` / `cbot-code`) và evidence compile/build hoặc `VERIFY=MANUAL`.
+3. Ghi `docs/{version}/5-reports/AUDIT-{slug}.md` từ `AUDIT.template.md`, với findings 🔴 blocking / 🟡 important / 🟢 nit, evidence và impact.
+4. Release decision:
+   - **✅ Approve:** không còn blocking và đủ evidence → TASK done, SESSION `mode=done`.
+   - **🔄 Changes requested:** ghi HANDOFF tester → developer, SESSION quay lại `implement`; không claim done.
 
 ## Output
 
 ```markdown
-## 🎼 Orchestration Report
+## 🎼 Delivery Report
 
-🎛️ **Harness:** class=`orchestrate` · mode=`…` · …
+### Artifacts
+- PRD: docs/{version}/1-prds/PRD-…
+- PLAN: docs/{version}/3-plans/PLAN-…
+- TASKS: docs/{version}/4-tasks/TASK-…
+- AUDIT: docs/{version}/5-reports/AUDIT-…
 
-### Overview
-…
-
-### Persona / Handoff
-| # | From → To | Handoff path | Status |
-|---|-----------|--------------|--------|
+### Release decision
+✅ Approve | 🔄 Changes requested
 
 ### Evidence
 - verify_profile=…
-- …
-
-### Next
-…
+- compile/build or VERIFY=MANUAL: …
+- tests/report/impact: …
 ```

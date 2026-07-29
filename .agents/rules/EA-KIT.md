@@ -27,6 +27,8 @@ For a `strategy`, large `feature`, or `orchestrate` gate, ask **one P0 blocking 
 
 Use one conversation and switch persona/mode deliberately. A cross-persona boundary needs an approved PLAN with the same information or a `HANDOFF-*.md` file. Create `SESSION.md` only for orchestration, multi-day work, or two or more handoffs.
 
+For `orchestrate`, the required lifecycle is: **Discovery → approved PRD → approved PLAN + TASK files → implement → code audit → release decision**. The audit must name findings as 🔴 blocking, 🟡 important, or 🟢 nit, cite evidence, and end with either `approve` or `changes requested`. A blocking finding or missing required evidence prevents `done`.
+
 ## Portable capabilities
 
 Use capabilities, not vendor tool names: `read`, `edit`, `search`, `exec`, `web`, and `graph`. If a graph capability is absent or the project is not indexed, state that briefly and continue with file/text search. Never block a task solely because a host integration is unavailable.

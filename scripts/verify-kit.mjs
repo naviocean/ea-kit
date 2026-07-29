@@ -316,8 +316,11 @@ if (fs.existsSync(path.join(AGENTS_DIR, 'fixtures', 'harness', 'routing.json')))
 }
 
 const harnessFiles = [
+    'docs/v1.0/1-prds/PRD.template.md',
     'docs/v1.0/4-tasks/HANDOFF.template.md',
     'docs/v1.0/4-tasks/SESSION.template.md',
+    'docs/v1.0/4-tasks/TASK.template.md',
+    'docs/v1.0/5-reports/AUDIT.template.md',
     'docs/architecture/VERIFY-PROFILES.md',
     'docs/architecture/DESIGN-agent-harness.md',
     'docs/architecture/ADR-003-agent-harness.md',
@@ -330,10 +333,10 @@ for (const rel of harnessFiles) {
 const orch = path.join(AGENTS_DIR, 'workflows', 'orchestrate.md');
 if (fs.existsSync(orch)) {
     const t = fs.readFileSync(orch, 'utf-8');
-    if (/class=`orchestrate`|class=\`orchestrate\`|class.*orchestrate/i.test(t) && /HANDOFF/i.test(t) && /SESSION/i.test(t)) {
-        ok('orchestrate.md: class + HANDOFF + SESSION');
+    if (/class=`orchestrate`|class=\`orchestrate\`|class.*orchestrate/i.test(t) && /PRD/i.test(t) && /TASK/i.test(t) && /AUDIT/i.test(t) && /HANDOFF/i.test(t) && /SESSION/i.test(t)) {
+        ok('orchestrate.md: full delivery lifecycle');
     } else {
-        fail('orchestrate.md missing harness wiring (class/HANDOFF/SESSION)');
+        fail('orchestrate.md missing full delivery lifecycle wiring');
     }
 }
 

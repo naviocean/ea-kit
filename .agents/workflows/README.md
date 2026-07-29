@@ -8,7 +8,7 @@ Entry points cho harness. Portable core rules: `.agents/rules/EA-KIT.md` (reques
 | ------- | ----- | ---- | ------- | ------- |
 | **`/brainstorm`** | `strategy` | `plan` | `algo-strategist` | Options; không code |
 | **`/plan`** | `strategy` / `feature` | `plan` | `algo-strategist` | `docs/…/3-plans/PLAN-*.md` |
-| **`/orchestrate`** | `orchestrate` | plan→implement→review | multi + **HANDOFF** + **SESSION** | Cần user Y sau plan |
+| **`/orchestrate`** | `orchestrate` | discovery→design→implement→review | multi + **PRD**, **PLAN**, **TASK**, **AUDIT**, HANDOFF + SESSION | Hai checkpoint approval + release gate |
 | **`/test`** | `analyze` | `review` | `ea-tester` | Report/log; fix qua HANDOFF |
 
 Ví dụ: `/plan XAUUSD session breakout` · `/test report bt.html`
@@ -20,6 +20,7 @@ Ví dụ: `/plan XAUUSD session breakout` · `/test report bt.html`
 | `HANDOFF-*.md` | Đổi persona qua ranh giới |
 | `SESSION.md` | Orchestrate / multi-day / multi-handoff |
 | `VERIFY-PROFILES.md` | Iron Law theo platform |
+| `PRD.template.md` / `TASK.template.md` / `AUDIT.template.md` | Artifacts bắt buộc của `/orchestrate` |
 
 Templates: `docs/v1.0/4-tasks/HANDOFF.template.md`, `SESSION.template.md`.
 

@@ -16,6 +16,9 @@ Master pointer for versioned EA/cBot documentation. Agents read this file to res
 | [`v1.0/3-plans/PLAN-agent-harness-v0.1.md`](./v1.0/3-plans/PLAN-agent-harness-v0.1.md) | Plan harness v0.1 (done) |
 | [`v1.0/4-tasks/HANDOFF.template.md`](./v1.0/4-tasks/HANDOFF.template.md) | Cross-persona handoff template |
 | [`v1.0/4-tasks/SESSION.template.md`](./v1.0/4-tasks/SESSION.template.md) | Session map template |
+| [`v1.0/1-prds/PRD.template.md`](./v1.0/1-prds/PRD.template.md) | Strategy requirements artifact |
+| [`v1.0/4-tasks/TASK.template.md`](./v1.0/4-tasks/TASK.template.md) | Executable delivery task artifact |
+| [`v1.0/5-reports/AUDIT.template.md`](./v1.0/5-reports/AUDIT.template.md) | Code-audit release gate artifact |
 
 ## Layout (see `documentation-standards` skill)
 
