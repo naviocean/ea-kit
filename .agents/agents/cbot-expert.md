@@ -4,6 +4,7 @@ description: Chuyên gia phát triển tự động cTrader cBot bằng C#. Nắ
 skills:
   core:
     - cbot-clean-code
+    - cbot-best-practices
   on_demand:
     - mt5-to-cbot-migration
     - ctrader-mcp-servers
