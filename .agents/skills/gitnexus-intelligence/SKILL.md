@@ -114,9 +114,9 @@ Check `.gitnexus/meta.json` → `stats.embeddings` before dropping embeddings.
 
 | Task | Skill |
 |------|-------|
-| Architecture / how X works | `.agents/skills/gitnexus/gitnexus-exploring/SKILL.md` |
-| Blast radius | `.agents/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |
-| Debugging | `.agents/skills/gitnexus/gitnexus-debugging/SKILL.md` |
-| Refactoring | `.agents/skills/gitnexus/gitnexus-refactoring/SKILL.md` |
-| Tools reference | `.agents/skills/gitnexus/gitnexus-guide/SKILL.md` |
-| CLI index/status | `.agents/skills/gitnexus/gitnexus-cli/SKILL.md` |
+| Architecture / how X works | `.agents/skills/gitnexus-exploring/SKILL.md` |
+| Blast radius | `.agents/skills/gitnexus-impact-analysis/SKILL.md` |
+| Debugging | `.agents/skills/gitnexus-debugging/SKILL.md` |
+| Refactoring | `.agents/skills/gitnexus-refactoring/SKILL.md` |
+| Tools reference | `.agents/skills/gitnexus-guide/SKILL.md` |
+| CLI index/status | `.agents/skills/gitnexus-cli/SKILL.md` |

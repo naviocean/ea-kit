@@ -1,5 +1,5 @@
 ---
-adapter: gemini
+adapter: antigravity
 ---
 
 # RedWave Labs EA Kit — Gemini / Antigravity Adapter

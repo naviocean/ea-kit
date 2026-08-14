@@ -97,11 +97,7 @@ function parseFrontmatter(content) {
 }
 
 function skillExists(skillName, skillDirs) {
-    // skills live as .agents/skills/<name>/ or nested gitnexus/*
     if (skillDirs.has(skillName)) return true;
-    // nested: gitnexus-exploring under skills/gitnexus/
-    const nested = path.join(AGENTS_DIR, 'skills', 'gitnexus', skillName, 'SKILL.md');
-    if (fs.existsSync(nested)) return true;
     const flat = path.join(AGENTS_DIR, 'skills', skillName, 'SKILL.md');
     return fs.existsSync(flat);
 }
@@ -112,14 +108,6 @@ function collectSkillNames() {
     for (const name of listDirs(skillsRoot)) {
         const skillMd = path.join(skillsRoot, name, 'SKILL.md');
         if (fs.existsSync(skillMd)) names.add(name);
-        // nested skill packages (gitnexus/*)
-        const sub = path.join(skillsRoot, name);
-        for (const child of listDirs(sub)) {
-            if (fs.existsSync(path.join(sub, child, 'SKILL.md'))) {
-                names.add(child);
-                names.add(`${name}/${child}`);
-            }
-        }
     }
     return names;
 }

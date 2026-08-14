@@ -73,6 +73,18 @@ test('link-host installs the Codex adapter and protects existing files', async (
     await assert.rejects(runCli('link-host', 'codex', '--path', project), /Destination already exists/);
 });
 
+test('link-host installs the Gemini/Antigravity adapter', async (t) => {
+    const project = await makeProject();
+    t.after(() => rm(project, { recursive: true, force: true }));
+
+    await runCli('init', '--path', project, '--quiet');
+    await runCli('link-host', 'antigravity', '--path', project);
+
+    const adapter = await readFile(path.join(project, 'GEMINI.md'), 'utf8');
+    assert.match(adapter, /EA-KIT\.md/);
+    assert.match(adapter, /Request routing/);
+});
+
 test('doctor is read-only and reports the portable core', async (t) => {
     const project = await makeProject();
     t.after(() => rm(project, { recursive: true, force: true }));

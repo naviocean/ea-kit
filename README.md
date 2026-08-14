@@ -115,7 +115,7 @@ Checks: expected agents/workflows, agent → skill paths, no monorepo/web ghost 
 
 `ea-kit doctor [-p <project>]` is read-only. It reports the Node version, kit installation, portable core rule, manifest, recognized host adapters, platform source hints, and RWCommon detection. Add `--strict` in CI when the kit and core rule must be present.
 
-`ea-kit link-host <codex|claude|cursor|gemini>` copies one adapter from the installed kit. It refuses to overwrite an existing host file unless `--force` is explicit; use `--dry-run` to preview.
+`ea-kit link-host <codex|claude|cursor|gemini|antigravity>` copies one adapter from the installed kit. It refuses to overwrite an existing host file unless `--force` is explicit; use `--dry-run` to preview.
 
 ---
 

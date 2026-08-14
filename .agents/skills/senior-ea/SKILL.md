@@ -1,5 +1,5 @@
 ---
-name: Senior EA Developer
+name: senior-ea
 description: Meta-skill indexing the RedWave MQL5 developer guidelines. Do not read for detailed implementation rules.
 ---
 # RedWave MQL5 Master Index

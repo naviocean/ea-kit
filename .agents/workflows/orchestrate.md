@@ -1,8 +1,12 @@
 ---
-description: Vòng đời EA/cBot khép kín: discovery → PRD → plan/tasks → implement → code audit.
+description: Vòng đời EA/cBot khép kín: discovery -> PRD -> plan/tasks -> implement -> code audit.
 ---
 
 # /orchestrate — Delivery lifecycle EA / cBot
+
+$ARGUMENTS
+
+---
 
 **Harness:** class=`orchestrate` · mode bắt đầu=`plan` · cần `SESSION.md`
 

@@ -25,7 +25,8 @@ const HOST_ADAPTERS = {
     codex: { source: ['adapters', 'codex', 'AGENTS.md'], destination: ['AGENTS.md'] },
     claude: { source: ['adapters', 'claude', 'CLAUDE.md'], destination: ['CLAUDE.md'] },
     cursor: { source: ['adapters', 'cursor', 'ea-kit.mdc'], destination: ['.cursor', 'rules', 'ea-kit.mdc'] },
-    gemini: { source: ['rules', 'GEMINI.md'], destination: ['GEMINI.md'] },
+    gemini: { source: ['adapters', 'gemini', 'GEMINI.md'], destination: ['GEMINI.md'] },
+    antigravity: { source: ['adapters', 'gemini', 'GEMINI.md'], destination: ['GEMINI.md'] },
 };
 
 // ============================================================================
@@ -380,7 +381,7 @@ const doctorCommand = (options) => {
         ['Codex', path.join(targetDir, 'AGENTS.md')],
         ['Claude Code', path.join(targetDir, 'CLAUDE.md')],
         ['Cursor', path.join(targetDir, '.cursor', 'rules', 'ea-kit.mdc')],
-        ['Gemini', path.join(targetDir, 'GEMINI.md')],
+        ['Gemini / Antigravity', path.join(targetDir, 'GEMINI.md')],
     ];
 
     console.log(chalk.blueBright(`\n${CLI_NAME} doctor\n`));
@@ -474,7 +475,7 @@ program
 
 program
     .command('link-host <host>')
-    .description('Install a host adapter: codex, claude, cursor, or gemini')
+    .description('Install a host adapter: codex, claude, cursor, gemini, or antigravity')
     .option('-f, --force', 'Replace an existing adapter file', false)
     .option('-p, --path <dir>', 'Path to the project directory', process.cwd())
     .option('--dry-run', 'Show the adapter file without copying it', false)
