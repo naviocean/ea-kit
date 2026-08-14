@@ -104,12 +104,15 @@ From this repository:
 
 ```bash
 npm test
-# same as: node scripts/verify-kit.mjs
+# runs verify-kit, verify-harness, eval-harness, and unit tests
+
+npm run eval
+# runs the Harness Compliance Benchmark (HCI) across routing, Socratic gate, and evidence policies
 ```
 
 Checks: expected agents/workflows, agent → skill paths, no monorepo/web ghost agents, package name `ea-kit`.
 
-`npm test` also runs routing contract fixtures from `.agents/fixtures/harness/`. They validate the kit's expected class → mode → persona → verify-profile routes; they are deterministic harness contracts, not a claim to grade LLM reasoning quality.
+`npm test` and `npm run eval` execute contract fixtures from `.agents/fixtures/harness/`. They validate the kit's expected class → mode → persona → verify-profile routes, sequential Socratic gate compliance, and Iron Law evidence integrity.
 
 ## Setup diagnostics
 

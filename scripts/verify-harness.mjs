@@ -48,7 +48,7 @@ function verifyFixture(fixture, source) {
 console.log('\nea-kit harness contracts\n');
 if (!fs.existsSync(fixturesDir)) fail('missing .agents/fixtures/harness/');
 else {
-    const files = fs.readdirSync(fixturesDir).filter((file) => file.endsWith('.json'));
+    const files = fs.readdirSync(fixturesDir).filter((file) => file.startsWith('routing') && file.endsWith('.json'));
     if (!files.length) fail('no harness fixture files');
     for (const file of files) {
         try {

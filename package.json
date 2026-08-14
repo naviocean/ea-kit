@@ -12,7 +12,8 @@
     "scripts"
   ],
   "scripts": {
-    "test": "node scripts/verify-kit.mjs && node scripts/verify-harness.mjs && node --test tests/cli.test.mjs",
+    "test": "node scripts/verify-kit.mjs && node scripts/verify-harness.mjs && node scripts/eval-harness.mjs && node --test tests/cli.test.mjs",
+    "eval": "node scripts/eval-harness.mjs",
     "verify": "node scripts/verify-kit.mjs"
   },
   "directories": {

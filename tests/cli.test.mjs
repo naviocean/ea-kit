@@ -94,3 +94,12 @@ test('doctor is read-only and reports the portable core', async (t) => {
     assert.match(stdout, /portable core rules/);
     assert.match(stdout, /\.agents installed/);
 });
+
+test('eval-harness runs benchmark evaluation and outputs HCI score', async () => {
+    const evalScript = path.join(root, 'scripts', 'eval-harness.mjs');
+    const { stdout } = await execFileAsync(process.execPath, [evalScript, '--json'], { cwd: root });
+    const result = JSON.parse(stdout);
+    assert.equal(result.overallScore, 100);
+    assert.equal(result.totalPassed, result.totalTests);
+    assert.ok(result.totalTests >= 16);
+});
